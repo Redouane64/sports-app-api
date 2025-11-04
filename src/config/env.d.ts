@@ -11,5 +11,8 @@ declare namespace NodeJS {
     // auth config
     JWT_SECRET: string;
     JWT_TOKEN_EXPIRES: string;
+
+    // database
+    DATABASE_URL: string;
   }
 }
