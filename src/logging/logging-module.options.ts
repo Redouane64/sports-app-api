@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { LoggerModuleAsyncParams, Params } from 'nestjs-pino';
 import pino from 'pino';
 import { ConfigProps } from 'src/config/interfaces/config-props.interface';
