@@ -1,6 +1,5 @@
 import { registerAs } from '@nestjs/config';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LoggerConfig {
   level: string;
 }
