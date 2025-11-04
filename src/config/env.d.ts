@@ -7,5 +7,9 @@ declare namespace NodeJS {
 
     // logging config
     LOGGING_LEVEL: string;
+
+    // auth config
+    JWT_SECRET: string;
+    JWT_TOKEN_EXPIRES: string;
   }
 }
