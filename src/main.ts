@@ -15,6 +15,8 @@ async function bootstrap() {
   app.useLogger(app.get(PinoLogger));
   app.flushLogs();
 
+  app.set('query parser', 'extended');
+
   const configService = app.get(ConfigService);
   const appConfig = configService.get<ConfigProps['app']>('app')!;
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
@@ -22,6 +24,10 @@ async function bootstrap() {
     new ValidationPipe({
       disableErrorMessages: appConfig.nodeEnv === 'production',
       transform: true,
+      whitelist: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 
