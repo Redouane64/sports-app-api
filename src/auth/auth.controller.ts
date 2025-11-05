@@ -1,53 +1,71 @@
 import {
   Body,
   Controller,
+  Headers,
   HttpStatus,
+  Ip,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { LoginUserParams } from './dto/login.dto';
 import { RegisterUserParams } from './dto/register.dto';
-import { type Request, type Response } from 'express';
-import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { type Response } from 'express';
 import { CurrentUser } from './decorators';
 import { type TokenPayloadOf } from './interfaces';
 import { AuthService } from './auth.service';
 import { PlatformConstants } from '../common';
 import { AuthResult } from './dto/auth-result.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RefreshTokenStrategyName } from './strategies/refresh-token-strategy';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  login(@Body() data: LoginUserParams) {
-    return {};
+  login(
+    @Body() data: LoginUserParams,
+    @Ip() ip?: string,
+    @Headers('User-Agent') userAgent?: string,
+  ): Promise<AuthResult> {
+    return this.authService.login(data, { userAgent, ip });
   }
 
   @Post('register')
-  @UseGuards(RefreshTokenGuard)
-  register(@Body() data: RegisterUserParams) {
-    return {};
+  register(
+    @Body() data: RegisterUserParams,
+    @Ip() ip?: string,
+    @Headers('User-Agent') userAgent?: string,
+  ): Promise<AuthResult> {
+    return this.authService.register(data, { userAgent, ip });
   }
 
+  @Post('refresh')
+  @UseGuards(AuthGuard(RefreshTokenStrategyName))
   async refreshToken(
     @CurrentUser() user: TokenPayloadOf<'refresh'>,
-    @Req() request: Request,
+    @Headers('User-Agent') userAgent?: string,
+    @Ip() ip?: string,
+    @Headers(PlatformConstants.USER_IP_HEADER) platformSpecificIp?: string,
   ): Promise<AuthResult> {
     const [accessToken, refreshToken] = await this.authService.refreshToken(
       user,
       {
-        ip: request.headers[PlatformConstants.USER_IP_HEADER]?.toString(),
-        userAgent: request.headers['user-agent'],
+        ip: ip || platformSpecificIp,
+        userAgent,
       },
     );
     return { accessToken, refreshToken };
   }
 
   @Post('logout')
-  logout(@Res() response: Response) {
-    response.sendStatus(HttpStatus.NO_CONTENT).send();
+  @UseGuards(AuthGuard('jwt'))
+  async logout(
+    @Res() response: Response,
+    @CurrentUser() user: TokenPayloadOf<'authentication'>,
+  ) {
+    await this.authService.logout(user);
+    return response.sendStatus(HttpStatus.NO_CONTENT);
   }
 }

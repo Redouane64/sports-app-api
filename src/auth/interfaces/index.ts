@@ -18,6 +18,7 @@ export interface AuthenticateUser {
   id: string;
   email: string;
   fullName: string;
+  sessionId?: string;
 }
 
 export type AuthenticationTokenPair = Omit<
@@ -27,12 +28,7 @@ export type AuthenticationTokenPair = Omit<
 
 export type RefreshTokenPayload = Pick<AuthenticateUser, 'email'>;
 
-export type TokenPurpose =
-  | 'authentication'
-  | 'refresh'
-  | 'verify'
-  | 'organization'
-  | 'organizationInviteActivation';
+export type TokenPurpose = 'authentication' | 'refresh';
 
 export type TokenPayload<P extends TokenPurpose> = P extends 'authentication'
   ? AuthenticateUser
@@ -42,3 +38,8 @@ export type TokenPayload<P extends TokenPurpose> = P extends 'authentication'
 
 export type TokenPayloadOf<P extends TokenPurpose> = BaseTokenPayload &
   TokenPayload<P>;
+
+export interface ClientMetadata {
+  ip?: string;
+  userAgent?: string;
+}

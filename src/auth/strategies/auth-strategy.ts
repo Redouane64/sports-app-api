@@ -7,7 +7,7 @@ import { AuthenticateUser, PurposeIds, TokenPayloadOf } from '../interfaces';
 import { ConfigProps } from '../../config';
 
 @Injectable()
-export class DefaultStrategy extends PassportStrategy(Strategy) {
+export class JwtAuthStrategy extends PassportStrategy(Strategy) {
   constructor(
     configService: ConfigService,
     private readonly authService: AuthService,
@@ -26,9 +26,11 @@ export class DefaultStrategy extends PassportStrategy(Strategy) {
     }
 
     // TODO: add user store look up logic
-    const user = {
+    const user: AuthenticateUser = {
       id: payload.id,
       email: payload.email,
+      fullName: payload.fullName,
+      sessionId: payload.jti,
     };
 
     if (!user) {

@@ -5,7 +5,7 @@ import { ConfigProps } from '../../config';
 import { ConfigService } from '@nestjs/config';
 import { PurposeIds, RefreshTokenPayload, TokenPayloadOf } from '../interfaces';
 
-export const RefreshTokenStrategyName = 'refresh-token';
+export const RefreshTokenStrategyName = 'token-refresh';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
