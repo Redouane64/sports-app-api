@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AuthenticateUser } from 'src/auth';
 import {
   DistanceFilter,
@@ -7,7 +7,7 @@ import {
 } from './dtos/list-tracks-filter-params.dto';
 import { CreateTrackParams } from './dtos/create-track-params.dto';
 import { UpdateTrackParams } from './dtos/update-track-params.dto';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { Track } from './entities/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedResult } from './dtos/paginated-result.dto';
@@ -41,24 +41,31 @@ export class TrackService {
     }
 
     if (q) {
-      query = query.andWhere((qFilter) =>
-        qFilter
-          .where(`t.title LIKE '%q%'`, { q })
-          .orWhere(`t.description LIKE '%q%'`, { q }),
+      query = query.andWhere(
+        new Brackets((qFilter) =>
+          qFilter
+            .where(`t.title LIKE :q`, { q: `%${q}%` })
+            .orWhere(`t.description LIKE :q`, { q: `%${q}%` }),
+        ),
       );
     }
 
     if (distance?.location) {
       const radius = distance.radius || DistanceFilter.DEFAULT_RADIUS;
-      const { lat, lon } = distance.location;
-      query.andWhere(
+      const [lon, lat] = distance.location.split(',');
+      query = query.andWhere(
         `ST_DWithin(
-          t.location::geography,
+          t.location,
           ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography,
           :radius
         )`,
-        { lon, lat, radius },
+        { lon: lon, lat: lat, radius, enabled: true },
       );
+    } else {
+      // if location is not provided by the client, we set enabled flag
+      // to false and set [0,0] pair for lan and lon params so the sql
+      // is still valid
+      query = query.setParameters({ lon: 0, lat: 0, enabled: false });
     }
 
     pagination ||= new PaginationParams();
@@ -69,18 +76,89 @@ export class TrackService {
       .orderBy('t.created_at', 'DESC')
       .getManyAndCount();
 
-    return new PaginatedResult(tracks, total, total > offset);
+    return new PaginatedResult(tracks, total, total < offset);
+  }
+
+  async findOne(
+    data: { trackId: string; location?: string },
+    user?: AuthenticateUser,
+  ) {
+    let query = this.trackRepository
+      .createQueryBuilder('track')
+      .leftJoinAndSelect('track.author', 'author')
+      .where(`track.id = :trackId`, {
+        trackId: data.trackId,
+      });
+
+    if (!user) {
+      query = query.andWhere(`track.public = :public`, { public: true });
+    } else {
+      query = query.andWhere(
+        new Brackets((qb) =>
+          qb
+            .where(`track.author_id = :aid`, { aid: user.id })
+            .orWhere(`track.public = :public`, { public: true }),
+        ),
+      );
+    }
+
+    if (data.location) {
+      const [lon, lat] = data.location.split(',');
+      query.setParameters({ lon, lat, enabled: true });
+    } else {
+      query.setParameters({ lon: 0, lat: 0, enabled: false });
+    }
+
+    return await query.getOne();
   }
 
   create(data: CreateTrackParams, user: AuthenticateUser) {
-    throw new Error('Method not implemented.');
+    const entity = this.trackRepository.create(data);
+    entity.authorId = user.id;
+    return this.trackRepository.save(entity, { reload: true });
   }
 
-  update(trackId: string, data: UpdateTrackParams, user: AuthenticateUser) {
-    throw new Error('Method not implemented.');
+  async update(
+    trackId: string,
+    data: UpdateTrackParams,
+    user: AuthenticateUser,
+  ) {
+    await this.trackRepository.update(
+      {
+        id: trackId,
+        authorId: user.id,
+      },
+      data,
+    );
+
+    return await this.trackRepository
+      .createQueryBuilder('track')
+      .leftJoinAndSelect('track.author', 'author')
+      .where(`track.id = :trackId AND track.author_id = :aid`, {
+        trackId,
+        aid: user.id,
+      })
+      .setParameters({ lon: 0, lat: 0, enabled: false })
+      .getOne();
   }
 
-  delete(trackId: string, user: AuthenticateUser) {
-    throw new Error('Method not implemented.');
+  async delete(trackId: string, user: AuthenticateUser) {
+    const entity = await this.trackRepository.findOne({
+      where: {
+        id: trackId,
+        authorId: user.id,
+      },
+      relations: {
+        author: true,
+      },
+    });
+
+    if (!entity) {
+      throw new NotFoundException('entity_not_found');
+    }
+
+    await this.trackRepository.delete({ id: trackId });
+
+    return entity;
   }
 }

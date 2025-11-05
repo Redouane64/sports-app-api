@@ -6,8 +6,9 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  VirtualColumn,
 } from 'typeorm';
-import { Location } from '../dtos/list-tracks-filter-params.dto';
+import { GeoJsonLocation } from '../dtos/list-tracks-filter-params.dto';
 
 @Entity('tracks')
 export class Track {
@@ -21,13 +22,28 @@ export class Track {
   description?: string;
 
   @Column('geography')
-  location!: Location;
+  location!: GeoJsonLocation;
+
+  @VirtualColumn({
+    query: (alias) => `
+      CASE
+        WHEN :enabled THEN
+          ST_Distance(
+              ${alias}.location::geography,
+              ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography
+          )
+        ELSE
+          NULL
+      END
+    `,
+  })
+  distance?: number;
 
   // TODO: may be upgrade to PostGIS native types
   @Column('jsonb', { default: `[]` })
   route: unknown;
 
-  @Column('int')
+  @Column('int', { nullable: true, name: 'total_distance' })
   totalDistance!: number;
 
   @Column('uuid', { name: 'author_id' })

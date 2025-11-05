@@ -14,12 +14,14 @@ import { Type } from 'class-transformer';
 import { IsLonLatTuple } from '../validators/is-lat-lon-tuple.validator';
 
 export class GeoJsonLocation {
+  @IsOptional()
   @IsString()
   @Equals('Point')
-  type!: 'Point';
+  type?: 'Point';
 
+  @IsOptional()
   @IsLonLatTuple()
-  coordinates!: [number, number];
+  coordinates?: [number, number];
 }
 
 export class DistanceFilter {
