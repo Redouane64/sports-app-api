@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Location } from './list-tracks-filter-params.dto';
+import { GeoJsonLocation } from './list-tracks-filter-params.dto';
 
 export class CreateTrackParams extends PickType(Track, [
   'title',
@@ -23,8 +23,8 @@ export class CreateTrackParams extends PickType(Track, [
   description?: string;
 
   @ValidateNested()
-  @Type(() => Location)
-  location!: Location;
+  @Type(() => GeoJsonLocation)
+  location!: GeoJsonLocation;
 
   @IsOptional()
   @Type(() => Boolean)

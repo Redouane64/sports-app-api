@@ -1,7 +1,7 @@
 import {
+  Equals,
   IsBoolean,
-  IsLatitude,
-  IsLongitude,
+  IsLatLong,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -11,23 +11,22 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsLonLatTuple } from '../validators/is-lat-lon-tuple.validator';
 
-export class Location {
-  @Type(() => Number)
-  @IsLongitude()
-  lon!: number;
+export class GeoJsonLocation {
+  @IsString()
+  @Equals('Point')
+  type!: 'Point';
 
-  @Type(() => Number)
-  @IsLatitude()
-  lat!: number;
+  @IsLonLatTuple()
+  coordinates!: [number, number];
 }
 
 export class DistanceFilter {
   public static DEFAULT_RADIUS = 10; // 10km
 
-  @IsOptional()
-  @Type(() => Location)
-  location?: Location;
+  @IsLatLong()
+  location!: string;
 
   @IsOptional()
   @Type(() => Number)
