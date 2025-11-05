@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { AuthService } from '../auth.service';
-import { User, PurposeIds, TokenPayloadOf } from '../interfaces';
+import { AuthenticateUser, PurposeIds, TokenPayloadOf } from '../interfaces';
 import { ConfigProps } from '../../config';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class DefaultStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: TokenPayloadOf<'authentication'>): User | null {
+  validate(payload: TokenPayloadOf<'authentication'>): AuthenticateUser | null {
     if (payload.purpose !== PurposeIds.authentication) {
       return null;
     }
