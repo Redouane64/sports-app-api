@@ -34,7 +34,7 @@ export class UpdateTrackParams extends PartialType(CreateTrackParams) {
   @IsOptional()
   @IsInt()
   @IsPositive()
-  totalDistance?: number;
+  averageSpeed?: number;
 
   @IsOptional()
   @IsInt()

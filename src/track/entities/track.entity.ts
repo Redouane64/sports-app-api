@@ -41,10 +41,22 @@ export class Track {
   distance?: number;
 
   // TODO: upgrade to PostGIS native types
-  @Column('jsonb', { default: `{}` })
+  @Column({
+    type: 'geometry',
+    spatialFeatureType: 'LineStringZ',
+    srid: 4326,
+    nullable: true,
+  })
   route?: object;
 
-  @Column('int', { nullable: true, name: 'total_distance' })
+  @Column('int', { name: 'average_speed', nullable: true })
+  averageSpeed?: number;
+
+  @VirtualColumn({
+    query: (alias) => `
+      st_3dlength(st_transform(${alias}.route, 32633))
+    `,
+  })
   totalDistance?: number;
 
   @Column('int', { nullable: true, name: 'total_time' })

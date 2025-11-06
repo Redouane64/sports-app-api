@@ -19,7 +19,6 @@ export class CreateTrackParams extends PickType(Track, [
   'public',
   'location',
   'route',
-  'totalDistance',
   'totalTime',
 ]) {
   @IsString()
@@ -35,6 +34,11 @@ export class CreateTrackParams extends PickType(Track, [
 
   @IsObject()
   route?: object;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  averageSpeed?: number;
 
   @IsOptional()
   @IsInt()
