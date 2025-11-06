@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import {
   ListTracksFilter,
-  PaginationParams,
 } from './dtos/list-tracks-filter-params.dto';
-import { type AuthenticateUser, CurrentUser } from 'src/auth';
+import { PaginationParams } from 'src/common/dtos/pagination-params.dto';
+import { type AuthenticatedUser, CurrentUser } from 'src/auth';
 import { CreateTrackParams } from './dtos/create-track-params.dto';
 import { UpdateTrackParams } from './dtos/update-track-params.dto';
 import { TrackService } from './track.service';
@@ -27,7 +27,7 @@ export class TrackController {
   list(
     @Query() filter: ListTracksFilter,
     @Query() pagination: PaginationParams,
-    @CurrentUser() user: AuthenticateUser,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.trackService.list(filter, pagination, user);
   }
@@ -36,7 +36,7 @@ export class TrackController {
   get(
     @Param('trackId') trackId: string,
     @Query('location') location: string,
-    @CurrentUser() user?: AuthenticateUser,
+    @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.trackService.findOne({ trackId, location }, user);
   }
@@ -45,7 +45,7 @@ export class TrackController {
   @UseGuards(AuthGuard('jwt'))
   create(
     @Body() data: CreateTrackParams,
-    @CurrentUser() user: AuthenticateUser,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.trackService.create(data, user);
   }
@@ -55,14 +55,14 @@ export class TrackController {
   update(
     @Param('id') trackId: string,
     @Body() data: UpdateTrackParams,
-    @CurrentUser() user: AuthenticateUser,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.trackService.update(trackId, data, user);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(@Param('id') trackId: string, @CurrentUser() user: AuthenticateUser) {
+  delete(@Param('id') trackId: string, @CurrentUser() user: AuthenticatedUser) {
     return this.trackService.delete(trackId, user);
   }
 }

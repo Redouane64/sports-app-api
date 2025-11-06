@@ -14,7 +14,7 @@ export type BaseTokenPayload = {
   purpose: JwtPurpose;
 };
 
-export interface AuthenticateUser {
+export interface AuthenticatedUser {
   id: string;
   email: string;
   fullName: string;
@@ -26,12 +26,12 @@ export type AuthenticationTokenPair = Omit<
   'purpose'
 >;
 
-export type RefreshTokenPayload = Pick<AuthenticateUser, 'email'>;
+export type RefreshTokenPayload = Pick<AuthenticatedUser, 'email'>;
 
 export type TokenPurpose = 'authentication' | 'refresh';
 
 export type TokenPayload<P extends TokenPurpose> = P extends 'authentication'
-  ? AuthenticateUser
+  ? AuthenticatedUser
   : P extends 'refresh'
     ? RefreshTokenPayload
     : never;

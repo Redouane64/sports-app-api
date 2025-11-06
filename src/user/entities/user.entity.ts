@@ -1,5 +1,5 @@
 import { Session } from 'src/auth/entities/session.entity';
-import { AuthenticateUser } from '../../auth';
+import { AuthenticatedUser } from '../../auth';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity('users')
-export class User implements Omit<AuthenticateUser, 'sessionId'> {
+export class User implements Omit<AuthenticatedUser, 'sessionId'> {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

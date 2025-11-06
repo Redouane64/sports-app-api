@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AuthenticateUser } from 'src/auth';
+import { AuthenticatedUser } from 'src/auth';
 import {
   DistanceFilter,
   ListTracksFilter,
-  PaginationParams,
 } from './dtos/list-tracks-filter-params.dto';
+import { PaginationParams } from 'src/common/dtos/pagination-params.dto';
 import { CreateTrackParams } from './dtos/create-track-params.dto';
 import { UpdateTrackParams } from './dtos/update-track-params.dto';
 import { Brackets, Repository } from 'typeorm';
 import { Track } from './entities/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginatedResult } from './dtos/paginated-result.dto';
+import { PaginatedResult } from '../common/dtos/paginated-result.dto';
 
 @Injectable()
 export class TrackService {
@@ -22,7 +22,7 @@ export class TrackService {
   async list(
     filter: ListTracksFilter,
     pagination: PaginationParams,
-    user?: AuthenticateUser,
+    user?: AuthenticatedUser,
   ) {
     const { authorId, distance, query: q } = filter;
 
@@ -81,7 +81,7 @@ export class TrackService {
 
   async findOne(
     data: { trackId: string; location?: string },
-    user?: AuthenticateUser,
+    user?: AuthenticatedUser,
   ) {
     let query = this.trackRepository
       .createQueryBuilder('track')
@@ -112,7 +112,7 @@ export class TrackService {
     return await query.getOne();
   }
 
-  create(data: CreateTrackParams, user: AuthenticateUser) {
+  create(data: CreateTrackParams, user: AuthenticatedUser) {
     const entity = this.trackRepository.create(data);
     entity.authorId = user.id;
     return this.trackRepository.save(entity, { reload: true });
@@ -121,7 +121,7 @@ export class TrackService {
   async update(
     trackId: string,
     data: UpdateTrackParams,
-    user: AuthenticateUser,
+    user: AuthenticatedUser,
   ) {
     await this.trackRepository.update(
       {
@@ -142,7 +142,7 @@ export class TrackService {
       .getOne();
   }
 
-  async delete(trackId: string, user: AuthenticateUser) {
+  async delete(trackId: string, user: AuthenticatedUser) {
     const entity = await this.trackRepository.findOne({
       where: {
         id: trackId,
