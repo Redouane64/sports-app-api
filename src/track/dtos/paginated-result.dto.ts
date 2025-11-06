@@ -4,6 +4,7 @@ export class PaginatedResult<T> {
     this.total = total;
     this.hasMore = !!hasMore;
   }
+
   items: T[];
   total: number;
   hasMore?: boolean;

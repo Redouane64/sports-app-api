@@ -9,6 +9,7 @@ import {
   VirtualColumn,
 } from 'typeorm';
 import { GeoJsonLocation } from '../dtos/list-tracks-filter-params.dto';
+import { TrackStatus } from '../interfaces';
 
 @Entity('tracks')
 export class Track {
@@ -39,12 +40,15 @@ export class Track {
   })
   distance?: number;
 
-  // TODO: may be upgrade to PostGIS native types
-  @Column('jsonb', { default: `[]` })
-  route: unknown;
+  // TODO: upgrade to PostGIS native types
+  @Column('jsonb', { default: `{}` })
+  route?: object;
 
   @Column('int', { nullable: true, name: 'total_distance' })
-  totalDistance!: number;
+  totalDistance?: number;
+
+  @Column('int', { nullable: true, name: 'total_time' })
+  totalTime?: number;
 
   @Column('uuid', { name: 'author_id' })
   authorId!: string;
@@ -53,8 +57,13 @@ export class Track {
   @JoinColumn({ name: 'author_id' })
   author!: User;
 
-  @Column('boolean', { default: false })
+  @VirtualColumn({
+    query: (alias) => `${alias}.status = 'PUBLIC'`,
+  })
   public!: boolean;
+
+  @Column('varchar', { default: TrackStatus.DRAFT })
+  status!: TrackStatus;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp without time zone' })
   createdAt!: Date;

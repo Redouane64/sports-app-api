@@ -1,19 +1,26 @@
 import { PickType } from '@nestjs/mapped-types';
 import { Track } from '../entities/track.entity';
 import {
-  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsObject,
   IsOptional,
+  IsPositive,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GeoJsonLocation } from './list-tracks-filter-params.dto';
+import { TrackStatus } from '../interfaces';
 
 export class CreateTrackParams extends PickType(Track, [
   'title',
   'description',
   'public',
   'location',
+  'route',
+  'totalDistance',
+  'totalTime',
 ]) {
   @IsString()
   title!: string;
@@ -26,8 +33,20 @@ export class CreateTrackParams extends PickType(Track, [
   @Type(() => GeoJsonLocation)
   location!: GeoJsonLocation;
 
+  @IsObject()
+  route?: object;
+
   @IsOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
-  public!: boolean;
+  @IsInt()
+  @IsPositive()
+  totalDistance?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  totalTime?: number;
+
+  @IsOptional()
+  @IsEnum(TrackStatus)
+  status!: TrackStatus;
 }

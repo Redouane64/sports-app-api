@@ -5,9 +5,13 @@ import {
   IsOptional,
   IsString,
   ValidateNested,
-  IsBoolean,
+  IsObject,
+  IsEnum,
+  IsInt,
+  IsPositive,
 } from 'class-validator';
 import { GeoJsonLocation } from './list-tracks-filter-params.dto';
+import { TrackStatus } from '../interfaces';
 
 export class UpdateTrackParams extends PartialType(CreateTrackParams) {
   @IsOptional()
@@ -24,7 +28,20 @@ export class UpdateTrackParams extends PartialType(CreateTrackParams) {
   location?: GeoJsonLocation;
 
   @IsOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
-  public?: boolean;
+  @IsObject()
+  route?: object;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  totalDistance?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  totalTime?: number;
+
+  @IsOptional()
+  @IsEnum(TrackStatus)
+  status!: TrackStatus;
 }
