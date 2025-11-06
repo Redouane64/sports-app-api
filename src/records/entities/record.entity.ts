@@ -7,6 +7,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { RecordStatus } from '../dtos/record-status.dto';
+import { Track } from 'src/track/entities/track.entity';
 
 @Entity('records')
 export class Record {
@@ -17,10 +19,17 @@ export class Record {
     type: 'geometry',
     spatialFeatureType: 'LineStringZ',
     srid: 4326,
+    // data may be too large, therefore we let the client decided
+    // when to select them as needed
+    select: false,
   })
   route!: object;
 
-  @Column('jsonb')
+  @Column('jsonb', {
+    // data may be too large, therefore we let the client decided
+    // when to select them as needed
+    select: false,
+  })
   timestamps!: Date[];
 
   @Column('uuid', { name: 'author_id' })
@@ -33,10 +42,13 @@ export class Record {
   @Column('uuid', { name: 'track_id' })
   trackId!: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Track, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'track_id' })
-  track!: User;
+  track!: Track;
 
-  @CreateDateColumn({ type: 'timestamp without time zone' })
+  @Column('varchar', { default: RecordStatus.DRAFT })
+  status!: RecordStatus;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp without time zone' })
   createdAt!: Date;
 }

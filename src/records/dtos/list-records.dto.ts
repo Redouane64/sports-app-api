@@ -1,11 +1,12 @@
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsArray, IsOptional, IsUUID } from 'class-validator';
 
 export class ListRecordFilter {
   @IsOptional()
   @IsUUID()
-  trackId?: string;
+  authorId?: string;
 
   @IsOptional()
-  @IsUUID()
-  authorId?: string;
+  @IsArray()
+  @IsUUID('all', { each: true })
+  ids!: string[];
 }
