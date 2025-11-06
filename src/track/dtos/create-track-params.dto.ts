@@ -38,11 +38,6 @@ export class CreateTrackParams extends PickType(Track, [
   @IsOptional()
   @IsInt()
   @IsPositive()
-  averageSpeed?: number;
-
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
   totalDistance?: number;
 
   @IsOptional()

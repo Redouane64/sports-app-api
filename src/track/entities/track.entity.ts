@@ -40,17 +40,16 @@ export class Track {
   })
   distance?: number;
 
-  // TODO: upgrade to PostGIS native types
   @Column({
     type: 'geometry',
     spatialFeatureType: 'LineStringZ',
     srid: 4326,
     nullable: true,
+    // data may be too large, therefore we let the client decided
+    // when to select them as needed
+    select: false,
   })
   route?: object;
-
-  @Column('int', { name: 'average_speed', nullable: true })
-  averageSpeed?: number;
 
   @VirtualColumn({
     query: (alias) => `

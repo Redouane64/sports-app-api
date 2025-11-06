@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -32,7 +33,7 @@ export class TrackController {
 
   @Get(':trackId')
   get(
-    @Param('trackId') trackId: string,
+    @Param('trackId', ParseUUIDPipe) trackId: string,
     @Query('location') location: string,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
@@ -51,7 +52,7 @@ export class TrackController {
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'))
   update(
-    @Param('id') trackId: string,
+    @Param('id', ParseUUIDPipe) trackId: string,
     @Body() data: UpdateTrackParams,
     @CurrentUser() user: AuthenticatedUser,
   ) {
@@ -60,7 +61,10 @@ export class TrackController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(@Param('id') trackId: string, @CurrentUser() user: AuthenticatedUser) {
+  delete(
+    @Param('id', ParseUUIDPipe) trackId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     return this.trackService.delete(trackId, user);
   }
 }

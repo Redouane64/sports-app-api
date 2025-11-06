@@ -34,11 +34,6 @@ export class UpdateTrackParams extends PartialType(CreateTrackParams) {
   @IsOptional()
   @IsInt()
   @IsPositive()
-  averageSpeed?: number;
-
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
   totalTime?: number;
 
   @IsOptional()
