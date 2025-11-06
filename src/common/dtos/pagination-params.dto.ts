@@ -1,7 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsOptional, IsNumber, Min } from 'class-validator';
 
-
 export class PaginationParams {
   @IsOptional()
   @Type(() => Number)

@@ -20,7 +20,9 @@ export class JwtAuthStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: TokenPayloadOf<'authentication'>): AuthenticatedUser | null {
+  validate(
+    payload: TokenPayloadOf<'authentication'>,
+  ): AuthenticatedUser | null {
     if (payload.purpose !== PurposeIds.authentication) {
       return null;
     }

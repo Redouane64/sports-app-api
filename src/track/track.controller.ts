@@ -9,9 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ListTracksFilter,
-} from './dtos/list-tracks-filter-params.dto';
+import { ListTracksFilter } from './dtos/list-tracks-filter-params.dto';
 import { PaginationParams } from 'src/common/dtos/pagination-params.dto';
 import { type AuthenticatedUser, CurrentUser } from 'src/auth';
 import { CreateTrackParams } from './dtos/create-track-params.dto';
