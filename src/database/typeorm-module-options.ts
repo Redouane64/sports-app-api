@@ -4,7 +4,7 @@ import {
   TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
 import { DatabaseConfig } from '../config/sections/database.config';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import { Session } from 'src/auth/entities/session.entity';
 import { Track } from 'src/track/entities/track.entity';
 import { Record } from 'src/records/entities/record.entity';

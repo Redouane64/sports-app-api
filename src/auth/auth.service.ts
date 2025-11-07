@@ -7,7 +7,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { LoginUserParams } from './dto/login.dto';
 import { TokenService } from './token.service';
 import { DataSource } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/auth/entities/user.entity';
 import crypto from 'node:crypto';
 import util from 'node:util';
 import { RegisterUserParams } from './dto/register.dto';
