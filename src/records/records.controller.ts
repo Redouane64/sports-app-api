@@ -29,7 +29,7 @@ export class RecordController {
     @Param('trackId', ParseUUIDPipe) trackId: string,
     @Query() filter: ListRecordFilter,
     @Query() pagination: PaginationParams,
-    @CurrentUser() user?: AuthenticatedUser,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.recordService.list(trackId, filter, pagination, user);
   }

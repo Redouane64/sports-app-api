@@ -1,6 +1,5 @@
 import {
   Equals,
-  IsBoolean,
   IsLatLong,
   IsNumber,
   IsOptional,

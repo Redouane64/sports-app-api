@@ -22,7 +22,7 @@ export class RecordService {
     trackId: string,
     filter: ListRecordFilter,
     pagination: PaginationParams,
-    user?: AuthenticatedUser,
+    user: AuthenticatedUser,
   ) {
     let query = this.recordRepository
       .createQueryBuilder('record')
@@ -83,6 +83,7 @@ export class RecordService {
       trackId,
       { ids: [entity.id] },
       { page: 1, perPage: 1 },
+      user,
     );
 
     return result.items.pop();
