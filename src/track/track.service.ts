@@ -23,21 +23,28 @@ export class TrackService {
   async list(
     filter: ListTracksFilter,
     pagination: PaginationParams,
-    user?: AuthenticatedUser,
+    user: AuthenticatedUser,
   ) {
-    const { authorId, distance, query: q } = filter;
+    // eslint-disable-next-line prefer-const
+    let { authorId, distance, query: q } = filter;
 
     let query = this.trackRepository
       .createQueryBuilder('t')
       .leftJoinAndSelect('t.author', 'author');
 
-    if (user && filter.myTracks) {
-      query = query.where('author_id = :oid', { oid: user.id });
+    authorId ??= user.id;
+    // user can only see other users' tracks set to Status='PUBLIC'
+    if (authorId !== user.id) {
+      query = query.where(
+        new Brackets((qb) =>
+          qb
+            .where('t.author_id = :authorId', { authorId })
+            .andWhere('t.status = :status', { status: TrackStatus.PUBLIC }),
+        ),
+      );
     } else {
-      query = query.where('status = :status', { status: TrackStatus.PUBLIC });
-    }
-
-    if (authorId) {
+      // if authorId is the same as current user, then they can all their own
+      // tracks
       query = query.where('t.author_id = :authorId', { authorId });
     }
 

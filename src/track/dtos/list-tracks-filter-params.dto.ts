@@ -47,11 +47,6 @@ export class ListTracksFilter {
   distance?: DistanceFilter;
 
   @IsOptional()
-  @Type(() => Boolean)
-  @IsBoolean()
-  myTracks?: boolean;
-
-  @IsOptional()
   @IsUUID()
   authorId?: string;
 }

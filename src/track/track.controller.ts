@@ -23,6 +23,7 @@ export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
   list(
     @Query() filter: ListTracksFilter,
     @Query() pagination: PaginationParams,
