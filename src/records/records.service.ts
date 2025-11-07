@@ -64,6 +64,7 @@ export class RecordService {
       .offset(offset)
       .limit(pagination.perPage)
       .orderBy('record.similarity_score', 'ASC', 'NULLS LAST')
+      .addOrderBy('record.total_time', 'ASC', 'NULLS LAST')
       .getManyAndCount();
 
     return new PaginatedResult(tracks, total, pagination);
