@@ -76,7 +76,7 @@ export class TrackService {
       .orderBy('t.created_at', 'DESC')
       .getManyAndCount();
 
-    return new PaginatedResult(tracks, total, total < offset);
+    return new PaginatedResult(tracks, total, pagination);
   }
 
   async findOne(

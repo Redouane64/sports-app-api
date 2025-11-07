@@ -58,7 +58,7 @@ export class RecordService {
       .orderBy('record.created_at', 'DESC')
       .getManyAndCount();
 
-    return new PaginatedResult(tracks, total, total < offset);
+    return new PaginatedResult(tracks, total, pagination);
   }
 
   async create(
