@@ -36,24 +36,26 @@ export class RecordService {
       query = query.andWhereInIds(ids);
     }
 
-    // if author not specified, current user is set as author filter
-    authorId ??= user?.id;
-    if (authorId) {
-      query = query.andWhere(`record.author_id = :authorId`, { authorId });
+    if (filter.myRecords) {
+      authorId = user.id;
     }
 
-    // status filter
-    if (!user || (user && authorId !== user.id)) {
-      // for non authenticated users or user querying other users' records, only show accepted record
-      query = query.andWhere(`record.status = :status`, {
-        status: RecordStatus.ACCEPTED,
-      });
-    } else {
+    if (authorId && authorId === user.id) {
+      query = query.andWhere('record.author_id = :authorId', { authorId });
+
       if (Array.isArray(filter.statuses) && filter.statuses.length > 0) {
-        query = query.andWhere(`record.status IN(:statuses)`, {
+        query = query.andWhere('record.status IN (:...statuses)', {
           statuses: filter.statuses,
         });
       }
+    } else {
+      if (authorId) {
+        query = query.andWhere('record.author_id = :authorId', { authorId });
+      }
+
+      query = query.andWhere('record.status = :status', {
+        status: RecordStatus.ACCEPTED,
+      });
     }
 
     pagination ||= new PaginationParams();
