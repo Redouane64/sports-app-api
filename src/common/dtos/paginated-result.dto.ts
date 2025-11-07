@@ -7,7 +7,7 @@ export class PaginatedResult<T> {
     this.hasMore = total - pagination.page! * pagination.perPage! > 0;
   }
 
-  items: T[];
   total: number;
   hasMore?: boolean;
+  items: T[];
 }
