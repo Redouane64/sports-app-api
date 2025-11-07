@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/auth';
 import {
   DistanceFilter,
@@ -32,20 +32,16 @@ export class TrackService {
       .createQueryBuilder('t')
       .leftJoinAndSelect('t.author', 'author');
 
-    authorId ??= user.id;
-    // user can only see other users' tracks set to Status='PUBLIC'
-    if (authorId !== user.id) {
-      query = query.where(
-        new Brackets((qb) =>
-          qb
-            .where('t.author_id = :authorId', { authorId })
-            .andWhere('t.status = :status', { status: TrackStatus.PUBLIC }),
-        ),
-      );
+    if (authorId) {
+      if (authorId === user.id) {
+        query = query.where('t.author_id = :authorId', { authorId });
+      } else {
+        query = query
+          .where('t.author_id = :authorId', { authorId })
+          .andWhere('t.status = :status', { status: TrackStatus.PUBLIC });
+      }
     } else {
-      // if authorId is the same as current user, then they can all their own
-      // tracks
-      query = query.where('t.author_id = :authorId', { authorId });
+      query = query.where('t.status = :status', { status: TrackStatus.PUBLIC });
     }
 
     if (q) {
@@ -160,22 +156,6 @@ export class TrackService {
   }
 
   async delete(trackId: string, user: AuthenticatedUser) {
-    const entity = await this.trackRepository.findOne({
-      where: {
-        id: trackId,
-        authorId: user.id,
-      },
-      relations: {
-        author: true,
-      },
-    });
-
-    if (!entity) {
-      throw new NotFoundException('entity_not_found');
-    }
-
-    await this.trackRepository.delete({ id: trackId });
-
-    return entity;
+    await this.trackRepository.delete({ id: trackId, authorId: user.id });
   }
 }
