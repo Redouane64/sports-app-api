@@ -17,7 +17,6 @@ import { type LineString } from 'typeorm';
 export class CreateTrackParams extends PickType(Track, [
   'title',
   'description',
-  'public',
   'location',
   'route',
   'totalTime',

@@ -11,6 +11,7 @@ import { Brackets, Repository } from 'typeorm';
 import { Track } from './entities/track.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginatedResult } from '../common/dtos/paginated-result.dto';
+import { TrackStatus } from './interfaces';
 
 @Injectable()
 export class TrackService {
@@ -33,7 +34,7 @@ export class TrackService {
     if (user && filter.myTracks) {
       query = query.where('author_id = :oid', { oid: user.id });
     } else {
-      query = query.where('public = :public', { public: true });
+      query = query.where('status = :status', { status: TrackStatus.PUBLIC });
     }
 
     if (authorId) {
@@ -91,13 +92,15 @@ export class TrackService {
       });
 
     if (!user) {
-      query = query.andWhere(`track.public = :public`, { public: true });
+      query = query.andWhere(`track.status = :status`, {
+        status: TrackStatus.PUBLIC,
+      });
     } else {
       query = query.andWhere(
         new Brackets((qb) =>
           qb
             .where(`track.author_id = :aid`, { aid: user.id })
-            .orWhere(`track.public = :public`, { public: true }),
+            .orWhere(`track.status = :status`, { status: TrackStatus.PUBLIC }),
         ),
       );
     }

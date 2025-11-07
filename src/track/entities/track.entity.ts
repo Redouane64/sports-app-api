@@ -70,12 +70,12 @@ export class Track {
   @JoinColumn({ name: 'author_id' })
   author!: User;
 
-  @Exclude()
   @VirtualColumn({
     query: (alias) => `${alias}.status = 'PUBLIC'`,
   })
   public!: boolean;
 
+  @Exclude()
   @Column('varchar', { default: TrackStatus.DRAFT })
   status!: TrackStatus;
 
