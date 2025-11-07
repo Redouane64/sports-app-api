@@ -8,6 +8,7 @@ import { Record } from './entities/record.entity';
 import { Repository } from 'typeorm';
 import { PaginatedResult } from 'src/common/dtos/paginated-result.dto';
 import { TrackService } from 'src/track/track.service';
+import { RecordStatus } from './dtos/record-status.dto';
 
 @Injectable()
 export class RecordService {
@@ -41,6 +42,14 @@ export class RecordService {
       query = query.andWhere(`record.author_id = :authorId`, { authorId });
     }
 
+    // status filter
+    if (!user || (user && authorId !== user.id)) {
+      // for non authenticated users or user querying other users' records, only show accepted record
+      query = query.andWhere(`record.status = :status`, {
+        status: RecordStatus.ACCEPTED,
+      });
+    }
+
     pagination ||= new PaginationParams();
     const offset = (pagination.page! - 1) * pagination.perPage!;
     const [tracks, total] = await query
@@ -62,12 +71,12 @@ export class RecordService {
       throw new NotFoundException('track_not_found');
     }
 
-    const { route, timestamps } = data;
+    const { route, totalTime } = data;
     const entity = await this.recordRepository.save({
       authorId: user.id,
       trackId,
       route,
-      timestamps,
+      totalTime,
     });
 
     const result = await this.list(
