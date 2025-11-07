@@ -63,7 +63,7 @@ export class RecordService {
     const [tracks, total] = await query
       .offset(offset)
       .limit(pagination.perPage)
-      .orderBy('record.created_at', 'DESC')
+      .orderBy('record.similarity_score', 'ASC', 'NULLS LAST')
       .getManyAndCount();
 
     return new PaginatedResult(tracks, total, pagination);
