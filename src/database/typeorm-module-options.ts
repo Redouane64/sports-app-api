@@ -19,7 +19,7 @@ export const typeormModuleOptions: TypeOrmModuleAsyncOptions = {
       url: databaseConfig.url,
       entities: [User, Session, Track, Record],
       synchronize: false,
-      logger: 'advanced-console',
+      logger: 'formatted-console',
       logging: 'all',
     };
   },
