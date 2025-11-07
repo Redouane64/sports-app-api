@@ -7,8 +7,9 @@ export class ListRecordFilter {
   authorId?: string;
 
   @IsOptional()
-  @IsEnum(RecordStatus)
-  status?: RecordStatus;
+  @IsArray()
+  @IsEnum(RecordStatus, { each: true })
+  statuses?: RecordStatus[];
 
   @IsOptional()
   @IsArray()

@@ -32,7 +32,7 @@ export class RecordService {
     // eslint-disable-next-line prefer-const
     let { authorId, ids } = filter;
 
-    if (ids?.length > 0) {
+    if (Array.isArray(ids) && ids?.length > 0) {
       query = query.andWhereInIds(ids);
     }
 
@@ -48,6 +48,12 @@ export class RecordService {
       query = query.andWhere(`record.status = :status`, {
         status: RecordStatus.ACCEPTED,
       });
+    } else {
+      if (Array.isArray(filter.statuses) && filter.statuses.length > 0) {
+        query = query.andWhere(`record.status IN(:statuses)`, {
+          statuses: filter.statuses,
+        });
+      }
     }
 
     pagination ||= new PaginationParams();
