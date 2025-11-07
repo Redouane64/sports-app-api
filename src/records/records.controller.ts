@@ -3,12 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
   Query,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { type AuthenticatedUser, CurrentUser } from 'src/auth';
@@ -17,7 +17,6 @@ import { ListRecordFilter } from './dtos/list-records.dto';
 import { PaginationParams } from 'src/common/dtos/pagination-params.dto';
 import { RecordService } from './records.service';
 import { AuthGuard } from '@nestjs/passport';
-import { type Response } from 'express';
 
 @Controller('records')
 export class RecordController {
@@ -46,12 +45,11 @@ export class RecordController {
 
   @Delete(':recordId')
   @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Param('recordId', ParseUUIDPipe) recordId: string,
     @CurrentUser() user: AuthenticatedUser,
-    @Res() response: Response,
   ) {
     await this.recordService.delete(recordId, user);
-    return response.status(HttpStatus.NO_CONTENT).send();
   }
 }
