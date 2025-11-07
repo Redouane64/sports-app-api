@@ -24,7 +24,7 @@ export class GeoJsonLocation {
 }
 
 export class DistanceFilter {
-  public static DEFAULT_RADIUS = 10; // 10km
+  public static DEFAULT_RADIUS = 5_000; // 5km
 
   @IsLatLong()
   location!: string;

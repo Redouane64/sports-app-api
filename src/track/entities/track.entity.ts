@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  type LineString,
   ManyToOne,
   PrimaryGeneratedColumn,
   VirtualColumn,
@@ -44,19 +45,18 @@ export class Track {
     type: 'geometry',
     spatialFeatureType: 'LineStringZ',
     srid: 4326,
-    nullable: true,
     // data may be too large, therefore we let the client decided
     // when to select them as needed
     select: false,
   })
-  route?: object;
+  route!: LineString;
 
   @VirtualColumn({
     query: (alias) => `
       st_3dlength(st_transform(${alias}.route, 32633))
     `,
   })
-  totalDistance?: number;
+  totalDistance!: number;
 
   @Column('int', { nullable: true, name: 'total_time' })
   totalTime?: number;

@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { GeoJsonLocation } from './list-tracks-filter-params.dto';
 import { TrackStatus } from '../interfaces';
+import { type LineString } from 'typeorm';
 
 export class UpdateTrackParams extends PartialType(CreateTrackParams) {
   @IsOptional()
@@ -29,7 +30,7 @@ export class UpdateTrackParams extends PartialType(CreateTrackParams) {
 
   @IsOptional()
   @IsObject()
-  route?: object;
+  route?: LineString;
 
   @IsOptional()
   @IsInt()

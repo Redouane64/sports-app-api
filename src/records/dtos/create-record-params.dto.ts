@@ -1,15 +1,17 @@
 import { PickType } from '@nestjs/mapped-types';
 import { Record } from '../entities/record.entity';
-import { IsArray, IsDateString, IsObject } from 'class-validator';
+import { IsInt, IsObject, IsOptional, IsPositive } from 'class-validator';
+import { type LineString } from 'typeorm';
 
 export class CreateRecordParams extends PickType(Record, [
   'route',
-  'timestamps',
+  'totalTime',
 ]) {
   @IsObject()
-  route!: object;
+  route!: LineString;
 
-  @IsArray()
-  @IsDateString({}, { each: true })
-  timestamps!: Date[];
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  totalTime?: number;
 }

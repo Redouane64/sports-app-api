@@ -12,6 +12,7 @@ import {
 import { Type } from 'class-transformer';
 import { GeoJsonLocation } from './list-tracks-filter-params.dto';
 import { TrackStatus } from '../interfaces';
+import { type LineString } from 'typeorm';
 
 export class CreateTrackParams extends PickType(Track, [
   'title',
@@ -33,7 +34,7 @@ export class CreateTrackParams extends PickType(Track, [
   location!: GeoJsonLocation;
 
   @IsObject()
-  route?: object;
+  route!: LineString;
 
   @IsOptional()
   @IsInt()

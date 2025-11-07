@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  type LineString,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  VirtualColumn,
 } from 'typeorm';
 import { RecordStatus } from '../dtos/record-status.dto';
 import { Track } from 'src/track/entities/track.entity';
@@ -23,14 +25,17 @@ export class Record {
     // when to select them as needed
     select: false,
   })
-  route!: object;
+  route!: LineString;
 
-  @Column('jsonb', {
-    // data may be too large, therefore we let the client decided
-    // when to select them as needed
-    select: false,
+  @Column('int', { nullable: true, name: 'total_time' })
+  totalTime?: number;
+
+  @VirtualColumn({
+    query: (alias) => `
+      st_3dlength(st_transform(${alias}.route, 32633))
+    `,
   })
-  timestamps!: Date[];
+  totalDistance!: number;
 
   @Column('uuid', { name: 'author_id' })
   authorId!: string;
@@ -45,6 +50,9 @@ export class Record {
   @ManyToOne(() => Track, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'track_id' })
   track!: Track;
+
+  @Column('double precision', { name: 'similarity_score', nullable: true })
+  similarityScore?: number;
 
   @Column('varchar', { default: RecordStatus.DRAFT })
   status!: RecordStatus;
