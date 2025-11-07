@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseBoolPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -33,12 +35,14 @@ export class TrackController {
   }
 
   @Get(':trackId')
+  @UseGuards(AuthGuard('jwt'))
   get(
     @Param('trackId', ParseUUIDPipe) trackId: string,
     @Query('location') location: string,
-    @CurrentUser() user?: AuthenticatedUser,
+    @Query('route', new DefaultValuePipe(false), ParseBoolPipe) route: boolean,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.trackService.findOne({ trackId, location }, user);
+    return this.trackService.findOne({ trackId, location }, { route }, user);
   }
 
   @Post()

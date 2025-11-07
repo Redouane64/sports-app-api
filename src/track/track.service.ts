@@ -89,6 +89,7 @@ export class TrackService {
 
   async findOne(
     data: { trackId: string; location?: string },
+    selection?: { route: boolean },
     user?: AuthenticatedUser,
   ) {
     let query = this.trackRepository
@@ -97,6 +98,10 @@ export class TrackService {
       .where(`track.id = :trackId`, {
         trackId: data.trackId,
       });
+
+    if (selection?.route) {
+      query = query.addSelect('track.route');
+    }
 
     if (!user) {
       query = query.andWhere(`track.status = :status`, {
@@ -122,10 +127,12 @@ export class TrackService {
     return await query.getOne();
   }
 
-  create(data: CreateTrackParams, user: AuthenticatedUser) {
+  async create(data: CreateTrackParams, user: AuthenticatedUser) {
     const entity = this.trackRepository.create(data);
     entity.authorId = user.id;
-    return this.trackRepository.save(entity, { reload: true });
+    await this.trackRepository.save(entity, { reload: true });
+
+    return await this.findOne({ trackId: entity.id }, { route: true }, user);
   }
 
   async update(
