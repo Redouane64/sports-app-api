@@ -1,4 +1,5 @@
-import scorer, { Point3D } from './distance-scorer-helper';
+import { Point } from 'typeorm';
+import scorer from './distance-scorer-helper';
 
 describe('Distance Scorer', () => {
   beforeEach(async () => {});
@@ -8,7 +9,7 @@ describe('Distance Scorer', () => {
   });
 
   it('should calculate distance', () => {
-    const pathA: Array<Point3D> = [
+    const pathA: Array<Point['coordinates']> = [
       [16.379551495908203, 48.198982182328706, 200],
       [16.384911637370493, 48.199230620023144, 200],
       [16.387076992529956, 48.19910048614287, 200],
@@ -16,11 +17,9 @@ describe('Distance Scorer', () => {
       [16.390005546639998, 48.19807123380929, 200],
       [16.390236281206256, 48.19762166883052, 200],
       [16.39135445641253, 48.19764533024329, 200],
-      [16.392348389927974, 48.19775180646681, 200],
-      [16.39257912449426, 48.19714843827455, 200],
     ];
 
-    const pathB: Array<Point3D> = [
+    const pathB: Array<Point['coordinates']> = [
       [16.379551493556733, 48.198934863093456, 200],
       [16.380350190132418, 48.198934863093456, 200],
       [16.381006896206088, 48.19910048850966, 200],
