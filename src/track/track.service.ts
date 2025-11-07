@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/auth';
-import {
-  DistanceFilter,
+import DistanceFilter, {
   ListTracksFilter,
 } from './dtos/list-tracks-filter-params.dto';
 import { PaginationParams } from 'src/common/dtos/pagination-params.dto';

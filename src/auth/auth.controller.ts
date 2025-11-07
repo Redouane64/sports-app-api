@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Headers,
+  HttpCode,
   HttpStatus,
   Ip,
   Post,
@@ -18,12 +19,33 @@ import { PlatformConstants } from '../common';
 import { AuthResult } from './dto/auth-result.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshTokenStrategyName } from './strategies/refresh-token-strategy';
+import {
+  ApiOperation,
+  ApiOkResponse,
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiNoContentResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @ApiOperation({
+    operationId: 'login',
+    summary: `Authenticate user and return authentication token`,
+  })
+  @ApiOkResponse({
+    type: AuthResult,
+    description: 'Access token',
+  })
+  @ApiBadRequestResponse({
+    description: 'Incorrect credentials',
+  })
   login(
     @Body() data: LoginUserParams,
     @Ip() ip?: string,
@@ -33,6 +55,14 @@ export class AuthController {
   }
 
   @Post('register')
+  @ApiOperation({
+    operationId: 'register',
+    summary: `Create new user and return authentication tokens`,
+  })
+  @ApiOkResponse({
+    type: AuthResult,
+    description: 'Access and refresh token pair',
+  })
   register(
     @Body() data: RegisterUserParams,
     @Ip() ip?: string,
@@ -43,6 +73,23 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(AuthGuard(RefreshTokenStrategyName))
+  @ApiBearerAuth()
+  @ApiOperation({
+    operationId: `refreshToken`,
+    summary: `refresh an existing authentication token`,
+  })
+  @ApiQuery({
+    name: 'token',
+    type: String,
+    description: `Refresh token`,
+  })
+  @ApiOkResponse({
+    type: AuthResult,
+    description: `A new authentication and refresh tokens`,
+  })
+  @ApiBadRequestResponse({
+    description: `Bad token`,
+  })
   async refreshToken(
     @CurrentUser() user: TokenPayloadOf<'refresh'>,
     @Headers('User-Agent') userAgent?: string,
@@ -61,11 +108,17 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
+  @ApiOperation({
+    operationId: 'logout',
+    summary: `Terminate authenticated user session`,
+  })
+  @ApiNoContentResponse({ description: 'Logout succeeded' })
   async logout(
     @Res() response: Response,
     @CurrentUser() user: TokenPayloadOf<'authentication'>,
   ) {
     await this.authService.logout(user);
-    return response.sendStatus(HttpStatus.NO_CONTENT);
   }
 }

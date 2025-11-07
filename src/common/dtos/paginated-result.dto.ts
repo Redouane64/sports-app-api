@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { PaginationParams } from './pagination-params.dto';
 
 export class PaginatedResult<T> {
@@ -7,7 +8,12 @@ export class PaginatedResult<T> {
     this.hasMore = total - pagination.page! * pagination.perPage! > 0;
   }
 
+  @ApiProperty()
   total: number;
+
+  @ApiProperty()
   hasMore?: boolean;
+
+  @ApiProperty()
   items: T[];
 }
