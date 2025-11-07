@@ -4,7 +4,12 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { ConfigProps } from './config/interfaces/config-props.interface';
 import { LoggerErrorInterceptor, Logger as PinoLogger } from 'nestjs-pino';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -19,7 +24,10 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const appConfig = configService.get<ConfigProps['app']>('app')!;
-  app.useGlobalInterceptors(new LoggerErrorInterceptor());
+  app.useGlobalInterceptors(
+    new LoggerErrorInterceptor(),
+    new ClassSerializerInterceptor(app.get(Reflector)),
+  );
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: appConfig.nodeEnv === 'production',

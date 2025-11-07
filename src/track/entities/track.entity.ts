@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { GeoJsonLocation } from '../dtos/list-tracks-filter-params.dto';
 import { TrackStatus } from '../interfaces';
+import { Exclude } from 'class-transformer';
 
 @Entity('tracks')
 export class Track {
@@ -61,6 +62,7 @@ export class Track {
   @Column('int', { nullable: true, name: 'total_time' })
   totalTime?: number;
 
+  @Exclude()
   @Column('uuid', { name: 'author_id' })
   authorId!: string;
 
@@ -68,6 +70,7 @@ export class Track {
   @JoinColumn({ name: 'author_id' })
   author!: User;
 
+  @Exclude()
   @VirtualColumn({
     query: (alias) => `${alias}.status = 'PUBLIC'`,
   })
@@ -76,6 +79,7 @@ export class Track {
   @Column('varchar', { default: TrackStatus.DRAFT })
   status!: TrackStatus;
 
+  @Exclude()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp without time zone' })
   createdAt!: Date;
 }

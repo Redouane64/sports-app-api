@@ -8,12 +8,14 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User implements Omit<AuthenticatedUser, 'sessionId'> {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Exclude()
   @Column('varchar', { nullable: false })
   @Index({ unique: true })
   email!: string;
@@ -21,9 +23,11 @@ export class User implements Omit<AuthenticatedUser, 'sessionId'> {
   @Column('varchar', { name: 'full_name' })
   fullName!: string;
 
+  @Exclude()
   @Column('varchar', { select: false })
   password!: string;
 
+  @Exclude()
   @OneToMany(() => Session, (session) => session.user, {
     eager: false,
     cascade: true,
@@ -31,6 +35,7 @@ export class User implements Omit<AuthenticatedUser, 'sessionId'> {
   })
   sessions?: Session[];
 
+  @Exclude()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp without time zone' })
   createdAt!: Date;
 }

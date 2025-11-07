@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { RecordStatus } from '../dtos/record-status.dto';
 import { Track } from 'src/track/entities/track.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('records')
 export class Record {
@@ -37,6 +38,7 @@ export class Record {
   })
   totalDistance!: number;
 
+  @Exclude()
   @Column('uuid', { name: 'author_id' })
   authorId!: string;
 
@@ -44,6 +46,7 @@ export class Record {
   @JoinColumn({ name: 'author_id' })
   author!: User;
 
+  @Exclude()
   @Column('uuid', { name: 'track_id' })
   trackId!: string;
 
@@ -51,6 +54,7 @@ export class Record {
   @JoinColumn({ name: 'track_id' })
   track!: Track;
 
+  @Exclude()
   @Column('double precision', { name: 'similarity_score', nullable: true })
   similarityScore?: number;
 
