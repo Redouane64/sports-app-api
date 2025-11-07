@@ -24,6 +24,7 @@ export const loggerModuleOptions: LoggerModuleAsyncParams = {
     return {
       exclude: ['/healthz', '/swagger', '/favicon.ico'],
       pinoHttp: {
+        redact: ['req.headers.authorization', 'res.headers.etag'],
         transport: {
           targets,
         },
