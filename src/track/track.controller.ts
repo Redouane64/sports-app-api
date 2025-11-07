@@ -4,6 +4,8 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseBoolPipe,
   ParseUUIDPipe,
@@ -66,10 +68,11 @@ export class TrackController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'))
-  delete(
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(
     @Param('id', ParseUUIDPipe) trackId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.trackService.delete(trackId, user);
+    await this.trackService.delete(trackId, user);
   }
 }
