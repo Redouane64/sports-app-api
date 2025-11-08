@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  type LineString,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -12,12 +11,16 @@ import {
 import { RecordStatus } from '../dtos/record-status.dto';
 import { Track } from 'src/track/entities/track.entity';
 import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { LineString } from 'src/common/dtos/line-string.dto';
 
 @Entity('records')
 export class Record {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ApiProperty()
   @Column({
     type: 'geometry',
     spatialFeatureType: 'LineStringZ',
@@ -28,9 +31,11 @@ export class Record {
   })
   route!: LineString;
 
+  @ApiProperty()
   @Column('int', { nullable: true, name: 'total_time' })
   totalTime?: number;
 
+  @ApiProperty()
   @VirtualColumn({
     query: (alias) => `
       st_3dlength(st_transform(${alias}.route, 32633))
@@ -42,6 +47,7 @@ export class Record {
   @Column('uuid', { name: 'author_id' })
   authorId!: string;
 
+  @ApiProperty()
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author_id' })
   author!: User;
@@ -50,6 +56,7 @@ export class Record {
   @Column('uuid', { name: 'track_id' })
   trackId!: string;
 
+  @ApiProperty()
   @ManyToOne(() => Track, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'track_id' })
   track!: Track;
@@ -58,9 +65,11 @@ export class Record {
   @Column('double precision', { name: 'similarity_score', nullable: true })
   similarityScore?: number;
 
+  @ApiProperty()
   @Column('varchar', { default: RecordStatus.DRAFT })
   status!: RecordStatus;
 
+  @ApiProperty()
   @CreateDateColumn({ name: 'created_at', type: 'timestamp without time zone' })
   createdAt!: Date;
 }
