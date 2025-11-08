@@ -21,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -74,6 +75,9 @@ export class RecordController {
   @ApiCreatedResponse({
     description: 'Record created successfully',
     type: Record,
+  })
+  @ApiNotFoundResponse({
+    description: 'Track does not exist',
   })
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)

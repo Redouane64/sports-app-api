@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/auth';
 import { PaginationParams } from 'src/common/dtos/pagination-params.dto';
 import { ListRecordFilter } from './dtos/list-records.dto';
@@ -76,14 +76,11 @@ export class RecordService {
     user: AuthenticatedUser,
   ) {
     const track = await this.trackService.findOne({ trackId });
-    if (!track) {
-      throw new NotFoundException('track_not_found');
-    }
 
     const { route, totalTime } = data;
     const entity = await this.recordRepository.save({
       authorId: user.id,
-      trackId,
+      trackId: track.id,
       route,
       totalTime,
     });
