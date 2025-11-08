@@ -72,10 +72,14 @@ describe('Auth (e2e)', () => {
     });
 
     it('should return 400 Bad Request when request body is {}', async () => {
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/auth/register')
         .send({})
         .expect(400);
+
+      expect(response.body).toHaveProperty('message');
+      expect(Array.isArray(response.body.message)).toBe(true);
+      expect(response.body.message.length).toBeGreaterThan(0);
     });
   });
 
@@ -113,10 +117,14 @@ describe('Auth (e2e)', () => {
     });
 
     it('should return 400 Bad Request when request body is {}', async () => {
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({})
         .expect(400);
+
+      expect(response.body).toHaveProperty('message');
+      expect(Array.isArray(response.body.message)).toBe(true);
+      expect(response.body.message.length).toBeGreaterThan(0);
     });
   });
 });
