@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { PaginationParams } from './pagination-params.dto';
 import { Type } from '@nestjs/common';
 
@@ -15,21 +15,24 @@ export class PaginatedResult<T> {
   @ApiProperty({ nullable: false })
   hasMore?: boolean;
 
-  @ApiProperty({ isArray: true, items: { type: 'object' } })
   items: T[];
 }
 
 export function PaginatedResponse<T>(classRef: Type<T>) {
-  class PaginatedResult {
-    @ApiProperty({ nullable: false })
-    total!: number;
-
-    @ApiProperty({ nullable: false })
-    hasMore?: boolean;
+  @ApiExtraModels(classRef)
+  class PaginatedResultClass extends PaginatedResult<T> {
+    constructor(items: T[], total: number, pagination: PaginationParams) {
+      super(items, total, pagination);
+      this.items = items;
+    }
 
     @ApiProperty({ isArray: true, type: classRef })
-    items!: T[];
+    items: T[];
   }
 
-  return PaginatedResult;
+  Object.defineProperty(PaginatedResultClass, 'name', {
+    value: `${classRef.name}PaginatedResult`,
+  });
+
+  return PaginatedResultClass;
 }
