@@ -9,9 +9,11 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('users')
 export class User implements Omit<AuthenticatedUser, 'sessionId'> {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -20,6 +22,7 @@ export class User implements Omit<AuthenticatedUser, 'sessionId'> {
   @Index({ unique: true })
   email!: string;
 
+  @ApiProperty()
   @Column('varchar', { name: 'full_name' })
   fullName!: string;
 
