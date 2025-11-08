@@ -7,11 +7,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeormModuleOptions } from './database/typeorm-module-options';
 import { TrackModule } from './track/track.module';
 import { RecordModule } from './records/record.module';
+import { ConditionalModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule,
-    LoggingModule,
+    ConditionalModule.registerWhen(
+      LoggingModule,
+      (env) => env.NODE_ENV !== 'test',
+      { debug: false },
+    ),
     AuthModule,
     TypeOrmModule.forRootAsync(typeormModuleOptions),
     TrackModule,
