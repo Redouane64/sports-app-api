@@ -111,7 +111,7 @@ export class AuthService {
     let session: Session | undefined;
     if (meta) {
       session = user.sessions!.find(
-        (s) => s.ip == meta.ip && s.userAgent === meta.userAgent,
+        (s) => s.ip == meta.ip || s.userAgent === meta.userAgent,
       );
 
       if (!session) {

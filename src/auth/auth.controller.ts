@@ -6,19 +6,17 @@ import {
   HttpStatus,
   Ip,
   Post,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { LoginUserParams } from './dto/login.dto';
 import { RegisterUserParams } from './dto/register.dto';
-import { type Response } from 'express';
 import { CurrentUser } from './decorators';
 import { type TokenPayloadOf } from './interfaces';
 import { AuthService } from './auth.service';
 import { PlatformConstants } from '../common';
 import { AuthResult } from './dto/auth-result.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { RefreshTokenStrategyName } from './strategies/refresh-token-strategy';
+import { RefreshTokenGuard } from './strategies/refresh-token-strategy';
 import {
   ApiOperation,
   ApiOkResponse,
@@ -46,6 +44,7 @@ export class AuthController {
   @ApiBadRequestResponse({
     description: 'Incorrect credentials',
   })
+  @HttpCode(HttpStatus.OK)
   login(
     @Body() data: LoginUserParams,
     @Ip() ip?: string,
@@ -63,6 +62,7 @@ export class AuthController {
     type: AuthResult,
     description: 'Access and refresh token pair',
   })
+  @HttpCode(HttpStatus.OK)
   register(
     @Body() data: RegisterUserParams,
     @Ip() ip?: string,
@@ -72,8 +72,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @UseGuards(AuthGuard(RefreshTokenStrategyName))
-  @ApiBearerAuth()
+  @UseGuards(RefreshTokenGuard)
   @ApiOperation({
     operationId: `refreshToken`,
     summary: `refresh an existing authentication token`,
@@ -115,10 +114,7 @@ export class AuthController {
     summary: `Terminate authenticated user session`,
   })
   @ApiNoContentResponse({ description: 'Logout succeeded' })
-  async logout(
-    @Res() response: Response,
-    @CurrentUser() user: TokenPayloadOf<'authentication'>,
-  ) {
+  async logout(@CurrentUser() user: TokenPayloadOf<'authentication'>) {
     await this.authService.logout(user);
   }
 }
