@@ -7,9 +7,10 @@ import { ConfigProps } from '../src/config/interfaces/config-props.interface';
 import { DataSource } from 'typeorm';
 import { User } from '../src/auth/entities/user.entity';
 import { Session } from '../src/auth/entities/session.entity';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 describe('Auth (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let dataSource: DataSource;
 
   beforeAll(async () => {
@@ -18,6 +19,7 @@ describe('Auth (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.set('query parser', 'extended');
     
     // Apply the same validation pipe configuration as in main.ts
     const configService = app.get(ConfigService);
@@ -40,11 +42,8 @@ describe('Auth (e2e)', () => {
   });
 
   afterAll(async () => {
-    // Clean database: delete sessions first (due to foreign key constraints), then users
     if (dataSource && dataSource.isInitialized) {
-      // Delete all sessions first (due to foreign key constraints)
       await dataSource.createQueryBuilder().delete().from(Session).execute();
-      // Then delete all users
       await dataSource.createQueryBuilder().delete().from(User).execute();
     }
     await app.close();
