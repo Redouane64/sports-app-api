@@ -117,7 +117,7 @@ export class TrackController {
     return this.trackService.create(data, user);
   }
 
-  @Patch(':id')
+  @Patch(':trackId')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update track', operationId: 'updateTrack' })
   @ApiOkResponse({
@@ -142,7 +142,7 @@ export class TrackController {
     return this.trackService.update(trackId, data, user);
   }
 
-  @Delete(':id')
+  @Delete(':trackId')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete track', operationId: 'deleteTrack' })
   @ApiNoContentResponse({
@@ -153,9 +153,6 @@ export class TrackController {
     description: 'Track ID',
     type: 'uuid',
     required: true,
-  })
-  @ApiNotFoundResponse({
-    description: 'Track not found',
   })
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.NO_CONTENT)

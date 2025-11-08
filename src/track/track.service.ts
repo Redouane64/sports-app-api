@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AuthenticatedUser } from 'src/auth';
 import DistanceFilter, {
   ListTracksFilter,
@@ -119,7 +119,12 @@ export class TrackService {
       query.setParameters({ lon: 0, lat: 0, enabled: false });
     }
 
-    return await query.getOne();
+    const track = await query.getOne();
+    if (!track) {
+      throw new NotFoundException('track_not_found');
+    }
+
+    return track;
   }
 
   async create(data: CreateTrackParams, user: AuthenticatedUser) {
