@@ -26,7 +26,7 @@ services:
         networks:
             - Api.Network
     postgres-test:
-        container_name: Api.Database
+        container_name: Api.Test.Database
         image: postgis/postgis:16-3.5-alpine
         # extra_hosts: [ 'host.docker.internal:host-gateway' ]
         restart: unless-stopped
@@ -35,6 +35,6 @@ services:
             POSTGRES_USER: admin
             POSTGRES_PASSWORD: admin
         ports:
-            - 14321:5432
+            - 14322:5432
         networks:
             - Api.Network
