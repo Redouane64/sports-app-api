@@ -47,8 +47,8 @@ export class TrackService {
       query = query.andWhere(
         new Brackets((qFilter) =>
           qFilter
-            .where(`t.title LIKE :q`, { q: `%${q}%` })
-            .orWhere(`t.description LIKE :q`, { q: `%${q}%` }),
+            .where(`t.title ILIKE :q`, { q: `%${q}%` })
+            .orWhere(`t.description ILIKE :q`, { q: `%${q}%` }),
         ),
       );
     }
