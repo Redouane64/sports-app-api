@@ -31,10 +31,7 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  PaginatedResponse,
-  PaginatedResult,
-} from 'src/common/dtos/paginated-result.dto';
+import { PaginatedResponse } from 'src/common/dtos/paginated-result.dto';
 import { Track } from './entities/track.entity';
 
 @ApiTags('Tracks')
@@ -71,7 +68,7 @@ export class TrackController {
   @ApiOperation({ summary: 'Find track by Id', operationId: 'findTrackById' })
   @ApiParam({
     name: 'trackId',
-    type: String,
+    type: 'uuid',
     required: true,
     description: 'The ID of the track to find',
     example: '123e4567-e89b-12d3-a456-426614174000',
