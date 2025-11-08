@@ -1,0 +1,88 @@
+[
+    {
+        "title": "Central Park Morning Run",
+        "description": "A scenic 5km morning run through Central Park, starting from the main entrance and following the park's main loop trail. Perfect for beginners and intermediate runners.",
+        "location": {
+            "coordinates": [
+                16.340072,
+                48.195864
+            ],
+            "type": "Point"
+        },
+        "route": {
+            "type": "LineString",
+            "coordinates": [
+                [
+                    16.340072,
+                    48.195864,
+                    200.0
+                ],
+                [
+                    16.340100,
+                    48.195900,
+                    201.0
+                ],
+                [
+                    16.340150,
+                    48.195950,
+                    202.0
+                ],
+                [
+                    16.340200,
+                    48.196000,
+                    203.0
+                ],
+                [
+                    16.340250,
+                    48.196050,
+                    204.0
+                ]
+            ]
+        },
+        "totalTime": 1800,
+        "status": "PUBLIC"
+    },
+    {
+        "title": "Riverside Cycling Trail",
+        "description": "A beautiful cycling route along the river, featuring gentle slopes and stunning waterfront views. Ideal for recreational cyclists looking for a relaxed ride.",
+        "location": {
+            "coordinates": [
+                16.353219,
+                48.222295
+            ],
+            "type": "Point"
+        },
+        "route": {
+            "type": "LineString",
+            "coordinates": [
+                [
+                    16.353219,
+                    48.222295,
+                    178.0
+                ],
+                [
+                    16.353250,
+                    48.222320,
+                    179.0
+                ],
+                [
+                    16.353300,
+                    48.222350,
+                    180.0
+                ],
+                [
+                    16.353350,
+                    48.222380,
+                    181.0
+                ],
+                [
+                    16.353400,
+                    48.222410,
+                    182.0
+                ]
+            ]
+        },
+        "totalTime": 2400,
+        "status": "PUBLIC"
+    }
+]
