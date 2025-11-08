@@ -25,3 +25,16 @@ services:
             - 14321:5432
         networks:
             - Api.Network
+    postgres-test:
+        container_name: Api.Database
+        image: postgis/postgis:16-3.5-alpine
+        # extra_hosts: [ 'host.docker.internal:host-gateway' ]
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: sports-app-db-test
+            POSTGRES_USER: admin
+            POSTGRES_PASSWORD: admin
+        ports:
+            - 14321:5432
+        networks:
+            - Api.Network
