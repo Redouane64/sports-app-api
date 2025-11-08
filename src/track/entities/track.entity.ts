@@ -4,7 +4,6 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  type LineString,
   ManyToOne,
   PrimaryGeneratedColumn,
   VirtualColumn,
@@ -12,21 +11,31 @@ import {
 import { GeoJsonLocation } from '../dtos/list-tracks-filter-params.dto';
 import { TrackStatus } from '../interfaces';
 import { Exclude } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { LineString } from 'src/common/dtos/line-string.dto';
 
 @Entity('tracks')
 export class Track {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ApiProperty()
   @Column('varchar')
   title!: string;
 
+  @ApiProperty()
   @Column('varchar', { nullable: true })
   description?: string;
 
+  @ApiProperty()
   @Column('geography')
   location!: GeoJsonLocation;
 
+  @ApiProperty({
+    nullable: true,
+    description: "Track distance in meters from the user's location",
+  })
   @VirtualColumn({
     query: (alias) => `
       CASE
@@ -42,6 +51,7 @@ export class Track {
   })
   distance?: number;
 
+  @ApiProperty()
   @Column({
     type: 'geometry',
     spatialFeatureType: 'LineStringZ',
@@ -52,6 +62,7 @@ export class Track {
   })
   route!: LineString;
 
+  @ApiProperty()
   @VirtualColumn({
     query: (alias) => `
       st_3dlength(st_transform(${alias}.route, 32633))
@@ -59,6 +70,7 @@ export class Track {
   })
   totalDistance!: number;
 
+  @ApiProperty({ nullable: true })
   @Column('int', { nullable: true, name: 'total_time' })
   totalTime?: number;
 
@@ -66,10 +78,12 @@ export class Track {
   @Column('uuid', { name: 'author_id' })
   authorId!: string;
 
+  @ApiProperty()
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'author_id' })
   author!: User;
 
+  @ApiProperty()
   @VirtualColumn({
     query: (alias) => `${alias}.status = 'PUBLIC'`,
   })

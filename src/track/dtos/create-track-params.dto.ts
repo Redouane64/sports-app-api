@@ -12,8 +12,8 @@ import {
 import { Type } from 'class-transformer';
 import { GeoJsonLocation } from './list-tracks-filter-params.dto';
 import { TrackStatus } from '../interfaces';
-import { type LineString } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { LineString } from 'src/common/dtos/line-string.dto';
 
 export class CreateTrackParams extends PickType(Track, [
   'title',
@@ -22,37 +22,35 @@ export class CreateTrackParams extends PickType(Track, [
   'route',
   'totalTime',
 ]) {
-  @ApiProperty()
+  @ApiProperty({ required: true, nullable: false })
   @IsString()
   title!: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false, nullable: true })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: true, nullable: false })
   @ValidateNested()
   @Type(() => GeoJsonLocation)
   location!: GeoJsonLocation;
 
-  @ApiProperty()
+  @ApiProperty({ required: true, nullable: false })
   @IsObject()
   route!: LineString;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsInt()
-  @IsPositive()
-  totalDistance?: number;
-
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ required: false, nullable: true })
   @IsOptional()
   @IsInt()
   @IsPositive()
   totalTime?: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    enum: TrackStatus,
+    default: TrackStatus.DRAFT,
+    required: false,
+  })
   @IsOptional()
   @IsEnum(TrackStatus)
   status!: TrackStatus;

@@ -12,8 +12,8 @@ import {
 } from 'class-validator';
 import { GeoJsonLocation } from './list-tracks-filter-params.dto';
 import { TrackStatus } from '../interfaces';
-import { type LineString } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { LineString } from 'src/common/dtos/line-string.dto';
 
 export class UpdateTrackParams extends PartialType(CreateTrackParams) {
   @ApiProperty({ required: false })

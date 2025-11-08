@@ -13,7 +13,12 @@ import { IsLonLatTuple } from '../validators/is-lat-lon-tuple.validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GeoJsonLocation {
-  @ApiProperty({ default: 'Point', example: 'Point', required: true })
+  @ApiProperty({
+    default: 'Point',
+    example: 'Point',
+    required: false,
+    nullable: false,
+  })
   @IsOptional()
   @IsString()
   @Equals('Point')
@@ -22,8 +27,8 @@ export class GeoJsonLocation {
   @ApiProperty({
     isArray: true,
     type: 'number',
-    required: false,
-    nullable: true,
+    required: true,
+    nullable: false,
     example: [16.353935, 48.221922],
   })
   @IsOptional()
@@ -34,9 +39,21 @@ export class GeoJsonLocation {
 export default class DistanceFilter {
   public static DEFAULT_RADIUS = 5_000; // 5km
 
+  @ApiProperty({
+    type: 'string',
+    required: true,
+    nullable: false,
+    example: '16.31868922735373,48.21628072871755',
+  })
   @IsLatLong()
   location!: string;
 
+  @ApiProperty({
+    type: 'number',
+    required: false,
+    nullable: false,
+    example: 700,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -54,6 +71,7 @@ export class ListTracksFilter {
     type: 'string',
     nullable: true,
     required: false,
+    description: 'Client location to calculate distance from the track',
     example: `distance[location]=16.31868922735373,48.21628072871755&distance[radius]=700`,
   })
   @IsOptional()
