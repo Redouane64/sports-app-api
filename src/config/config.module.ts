@@ -11,7 +11,7 @@ import databaseConfig from './sections/database.config';
     NestConfig.ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, loggerConfig, authConfig, databaseConfig],
-      envFilePath: ['.env'],
+      envFilePath: [process.env.NODE_ENV === 'test' ? '.env.test' : '.env'],
     }),
   ],
 })
