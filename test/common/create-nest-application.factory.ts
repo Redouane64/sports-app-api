@@ -31,10 +31,7 @@ export async function CreateNestApplication(): Promise<NestExpressApplication> {
       },
     }),
   );
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector)),
-  );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   return app;
 }
-

@@ -1,4 +1,4 @@
-import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { PaginationParams } from './pagination-params.dto';
 import { Type } from '@nestjs/common';
 
