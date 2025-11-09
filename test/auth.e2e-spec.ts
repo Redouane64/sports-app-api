@@ -1,46 +1,21 @@
-import { ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { ConfigProps } from '../src/config/interfaces/config-props.interface';
 import { DataSource } from 'typeorm';
 import { User } from '../src/auth/entities/user.entity';
 import { Session } from '../src/auth/entities/session.entity';
 import { Track } from '../src/track/entities/track.entity';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AuthResult } from 'src/auth/dto/auth-result.dto';
+import { CreateNestApplication } from './common/create-nest-application.factory';
 
 describe('Auth (e2e)', () => {
   let app: NestExpressApplication;
   let dataSource: DataSource;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.set('query parser', 'extended');
-
-    // Apply the same validation pipe configuration as in main.ts
-    const configService = app.get(ConfigService);
-    const appConfig = configService.get<ConfigProps['app']>('app')!;
-    app.useGlobalPipes(
-      new ValidationPipe({
-        disableErrorMessages: appConfig.nodeEnv === 'production',
-        transform: true,
-        whitelist: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
-
-    // Get DataSource for database cleanup
-    dataSource = app.get(DataSource);
-
+    app = await CreateNestApplication();
     await app.init();
+
+    dataSource = app.get(DataSource);
   });
 
   afterAll(async () => {

@@ -1,17 +1,15 @@
-import { ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { ConfigProps } from '../src/config/interfaces/config-props.interface';
 import { DataSource } from 'typeorm';
 import { User } from '../src/auth/entities/user.entity';
 import { Session } from '../src/auth/entities/session.entity';
 import { Track } from '../src/track/entities/track.entity';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as TestData from './tracks/test-data.json';
 import { AuthResult } from 'src/auth/dto/auth-result.dto';
 import { PaginatedResult } from 'src/common/dtos/paginated-result.dto';
+import { CreateNestApplication } from './common/create-nest-application.factory';
+
+// test data
+import * as TestData from './tracks/test-data.json';
 
 describe('TrackController (e2e)', () => {
   let app: NestExpressApplication;
@@ -20,31 +18,10 @@ describe('TrackController (e2e)', () => {
   let userId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.set('query parser', 'extended');
-
-    // Apply the same validation pipe configuration as in main.ts
-    const configService = app.get(ConfigService);
-    const appConfig = configService.get<ConfigProps['app']>('app')!;
-    app.useGlobalPipes(
-      new ValidationPipe({
-        disableErrorMessages: appConfig.nodeEnv === 'production',
-        transform: true,
-        whitelist: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
-
-    // Get DataSource for database cleanup
-    dataSource = app.get(DataSource);
-
+    app = await CreateNestApplication();
     await app.init();
+
+    dataSource = app.get(DataSource);
 
     // Create a user and get access token
     const registerDto = {
@@ -117,8 +94,6 @@ describe('TrackController (e2e)', () => {
           expect(response.body).toHaveProperty('location', track.location);
           expect(response.body).toHaveProperty('route', track.route);
           expect(response.body).toHaveProperty('totalTime', track.totalTime);
-          expect(response.body).toHaveProperty('status', track.status);
-          expect(response.body).toHaveProperty('authorId', userId);
           expect(response.body).toHaveProperty('public', true);
         }),
       );

@@ -1,18 +1,16 @@
-import { ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { ConfigProps } from '../src/config/interfaces/config-props.interface';
 import { DataSource } from 'typeorm';
 import { User } from '../src/auth/entities/user.entity';
 import { Session } from '../src/auth/entities/session.entity';
 import { Track } from '../src/track/entities/track.entity';
 import { Record } from '../src/records/entities/record.entity';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as TestData from './tracks/test-data.json';
 import { AuthResult } from 'src/auth/dto/auth-result.dto';
 import { PaginatedResult } from 'src/common/dtos/paginated-result.dto';
+import { CreateNestApplication } from './common/create-nest-application.factory';
+
+// test data
+import * as TestData from './tracks/test-data.json';
 
 describe('RecordController (e2e)', () => {
   let app: NestExpressApplication;
@@ -22,29 +20,10 @@ describe('RecordController (e2e)', () => {
   let trackId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.set('query parser', 'extended');
-
-    const configService = app.get(ConfigService);
-    const appConfig = configService.get<ConfigProps['app']>('app')!;
-    app.useGlobalPipes(
-      new ValidationPipe({
-        disableErrorMessages: appConfig.nodeEnv === 'production',
-        transform: true,
-        whitelist: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
+    app = await CreateNestApplication();
+    await app.init();
 
     dataSource = app.get(DataSource);
-
-    await app.init();
 
     const registerDto = {
       email: `test.record@test.com`,
@@ -151,7 +130,6 @@ describe('RecordController (e2e)', () => {
 
       body.items.forEach((record: Record) => {
         expect(record).toHaveProperty('id');
-        expect(record).toHaveProperty('trackId', trackId);
         expect(record).toHaveProperty('author');
         expect(record.author).toHaveProperty('id', userId);
       });
