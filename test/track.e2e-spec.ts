@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -8,9 +8,10 @@ import { DataSource } from 'typeorm';
 import { User } from '../src/auth/entities/user.entity';
 import { Session } from '../src/auth/entities/session.entity';
 import { Track } from '../src/track/entities/track.entity';
-import * as TestData from './tracks/test-data.json';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { setTimeout } from 'timers/promises';
+import * as TestData from './tracks/test-data.json';
+import { AuthResult } from 'src/auth/dto/auth-result.dto';
+import { PaginatedResult } from 'src/common/dtos/paginated-result.dto';
 
 describe('TrackController (e2e)', () => {
   let app: NestExpressApplication;
@@ -46,7 +47,7 @@ describe('TrackController (e2e)', () => {
     await app.init();
 
     // Create a user and get access token
-    const registerData = {
+    const registerDto = {
       email: `test.track@test.com`,
       password: 'test123',
       fullName: 'Test User',
@@ -54,16 +55,17 @@ describe('TrackController (e2e)', () => {
 
     const registerResponse = await request(app.getHttpServer())
       .post('/auth/register')
-      .send(registerData)
+      .send(registerDto)
       .expect(200);
 
-    accessToken = registerResponse.body.accessToken;
+    const body = registerResponse.body as AuthResult;
+    accessToken = body.accessToken;
 
     // Get user ID from database
     const user = await dataSource
       .getRepository(User)
-      .findOne({ where: { email: registerData.email } });
-    
+      .findOne({ where: { email: registerDto.email } });
+
     // save user id for filtering by authorId tests
     userId = user!.id;
   });
@@ -84,35 +86,42 @@ describe('TrackController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('items');
-      expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('hasMore');
-      expect(Array.isArray(response.body.items)).toBe(true);
-      expect(response.body.items.length).toBe(0);
-      expect(response.body.total).toBe(0);
-      expect(response.body.hasMore).toBe(false);
+      const body = response.body as PaginatedResult<Track>;
+
+      expect(body).toHaveProperty('items');
+      expect(body).toHaveProperty('total');
+      expect(body).toHaveProperty('hasMore');
+      expect(Array.isArray(body.items)).toBe(true);
+      expect(body.items.length).toBe(0);
+      expect(body.total).toBe(0);
+      expect(body.hasMore).toBe(false);
     });
   });
 
   describe('POST /tracks', () => {
     it('should create track', async () => {
-      await Promise.all(Array.from(TestData).map(async (track: any) => {
-        const response = await request(app.getHttpServer())
-          .post('/tracks')
-          .set('Authorization', `Bearer ${accessToken}`)
-          .send(track)
-          .expect(201);
+      await Promise.all(
+        Array.from(TestData).map(async (track: (typeof TestData)[number]) => {
+          const response = await request(app.getHttpServer())
+            .post('/tracks')
+            .set('Authorization', `Bearer ${accessToken}`)
+            .send(track)
+            .expect(201);
 
-        expect(response.body).toHaveProperty('id');
-        expect(response.body).toHaveProperty('title', track.title);
-        expect(response.body).toHaveProperty('description', track.description);
-        expect(response.body).toHaveProperty('location', track.location);
-        expect(response.body).toHaveProperty('route', track.route);
-        expect(response.body).toHaveProperty('totalTime', track.totalTime);
-        expect(response.body).toHaveProperty('status', track.status);
-        expect(response.body).toHaveProperty('authorId', userId);
-        expect(response.body).toHaveProperty('public', true);
-      }));
+          expect(response.body).toHaveProperty('id');
+          expect(response.body).toHaveProperty('title', track.title);
+          expect(response.body).toHaveProperty(
+            'description',
+            track.description,
+          );
+          expect(response.body).toHaveProperty('location', track.location);
+          expect(response.body).toHaveProperty('route', track.route);
+          expect(response.body).toHaveProperty('totalTime', track.totalTime);
+          expect(response.body).toHaveProperty('status', track.status);
+          expect(response.body).toHaveProperty('authorId', userId);
+          expect(response.body).toHaveProperty('public', true);
+        }),
+      );
     });
   });
 
@@ -123,14 +132,16 @@ describe('TrackController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('items');
-      expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('hasMore');
-      expect(Array.isArray(response.body.items)).toBe(true);
-      expect(response.body.total).toBe(TestData.length);
-      expect(response.body.items.length).toBe(TestData.length);
+      const body = response.body as PaginatedResult<Track>;
+
+      expect(body).toHaveProperty('items');
+      expect(body).toHaveProperty('total');
+      expect(body).toHaveProperty('hasMore');
+      expect(Array.isArray(body.items)).toBe(true);
+      expect(body.total).toBe(TestData.length);
+      expect(body.items.length).toBe(TestData.length);
     });
-  
+
     it('should filter tracks by query keyword', async () => {
       const keyword = 'Riverside';
       const response = await request(app.getHttpServer())
@@ -139,17 +150,23 @@ describe('TrackController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('items');
-      expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('hasMore');
-      expect(Array.isArray(response.body.items)).toBe(true);
-      expect(response.body.total).toBeGreaterThanOrEqual(1);
-      expect(response.body.items.length).toBeGreaterThanOrEqual(1);
+      const body = response.body as PaginatedResult<Track>;
+
+      expect(body).toHaveProperty('items');
+      expect(body).toHaveProperty('total');
+      expect(body).toHaveProperty('hasMore');
+      expect(Array.isArray(body.items)).toBe(true);
+      expect(body.total).toBeGreaterThanOrEqual(1);
+      expect(body.items.length).toBeGreaterThanOrEqual(1);
 
       // Check that all returned tracks contain the keyword
-      response.body.items.forEach((track: any) => {
-        const titleMatch = track.title?.toLowerCase().includes(keyword.toLowerCase());
-        const descMatch = track.description?.toLowerCase().includes(keyword.toLowerCase());
+      body.items.forEach((track: Track) => {
+        const titleMatch = track.title
+          ?.toLowerCase()
+          .includes(keyword.toLowerCase());
+        const descMatch = track.description
+          ?.toLowerCase()
+          .includes(keyword.toLowerCase());
         expect(titleMatch || descMatch).toBe(true);
       });
     });
@@ -164,12 +181,14 @@ describe('TrackController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('items');
-      expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('hasMore');
-      expect(Array.isArray(response.body.items)).toBe(true);
-      expect(response.body.total).toBeGreaterThanOrEqual(1);
-      expect(response.body.items[0].distance).toBeTruthy()
+      const body = response.body as PaginatedResult<Track>;
+
+      expect(body).toHaveProperty('items');
+      expect(body).toHaveProperty('total');
+      expect(body).toHaveProperty('hasMore');
+      expect(Array.isArray(body.items)).toBe(true);
+      expect(body.total).toBeGreaterThanOrEqual(1);
+      expect(body.items[0].distance).toBeTruthy();
     });
 
     it('should filter tracks by authorId', async () => {
@@ -179,14 +198,16 @@ describe('TrackController (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('items');
-      expect(response.body).toHaveProperty('total');
-      expect(response.body).toHaveProperty('hasMore');
-      expect(Array.isArray(response.body.items)).toBe(true);
-      expect(response.body.total).toBe(2);
+      const body = response.body as PaginatedResult<Track>;
+
+      expect(body).toHaveProperty('items');
+      expect(body).toHaveProperty('total');
+      expect(body).toHaveProperty('hasMore');
+      expect(Array.isArray(body.items)).toBe(true);
+      expect(body.total).toBe(2);
 
       // Check that all returned tracks belong to the user
-      response.body.items.forEach((track: any) => {
+      body.items.forEach((track: Track) => {
         expect(track.author).toHaveProperty('id', userId);
       });
     });

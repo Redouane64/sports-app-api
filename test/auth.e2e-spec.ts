@@ -1,4 +1,4 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -7,7 +7,9 @@ import { ConfigProps } from '../src/config/interfaces/config-props.interface';
 import { DataSource } from 'typeorm';
 import { User } from '../src/auth/entities/user.entity';
 import { Session } from '../src/auth/entities/session.entity';
+import { Track } from '../src/track/entities/track.entity';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { AuthResult } from 'src/auth/dto/auth-result.dto';
 
 describe('Auth (e2e)', () => {
   let app: NestExpressApplication;
@@ -20,7 +22,7 @@ describe('Auth (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.set('query parser', 'extended');
-    
+
     // Apply the same validation pipe configuration as in main.ts
     const configService = app.get(ConfigService);
     const appConfig = configService.get<ConfigProps['app']>('app')!;
@@ -34,15 +36,16 @@ describe('Auth (e2e)', () => {
         },
       }),
     );
-    
+
     // Get DataSource for database cleanup
     dataSource = app.get(DataSource);
-    
+
     await app.init();
   });
 
   afterAll(async () => {
     if (dataSource && dataSource.isInitialized) {
+      await dataSource.createQueryBuilder().delete().from(Track).execute();
       await dataSource.createQueryBuilder().delete().from(Session).execute();
       await dataSource.createQueryBuilder().delete().from(User).execute();
     }
@@ -62,12 +65,14 @@ describe('Auth (e2e)', () => {
         .send(registerData)
         .expect(200);
 
-      expect(response.body).toHaveProperty('accessToken');
-      expect(response.body).toHaveProperty('refreshToken');
-      expect(typeof response.body.accessToken).toBe('string');
-      expect(typeof response.body.refreshToken).toBe('string');
-      expect(response.body.accessToken.length).toBeGreaterThan(0);
-      expect(response.body.refreshToken.length).toBeGreaterThan(0);
+      const body = response.body as AuthResult;
+
+      expect(body).toHaveProperty('accessToken');
+      expect(body).toHaveProperty('refreshToken');
+      expect(typeof body.accessToken).toBe('string');
+      expect(typeof body.refreshToken).toBe('string');
+      expect(body.accessToken.length).toBeGreaterThan(0);
+      expect(body.refreshToken.length).toBeGreaterThan(0);
     });
 
     it('should return 400 Bad Request when request body is {}', async () => {
@@ -76,9 +81,10 @@ describe('Auth (e2e)', () => {
         .send({})
         .expect(400);
 
-      expect(response.body).toHaveProperty('message');
-      expect(Array.isArray(response.body.message)).toBe(true);
-      expect(response.body.message.length).toBeGreaterThan(0);
+      const body = response.body as Record<'message', string[]>;
+      expect(body).toHaveProperty('message');
+      expect(Array.isArray(body.message)).toBe(true);
+      expect(body.message.length).toBeGreaterThan(0);
     });
   });
 
@@ -107,12 +113,14 @@ describe('Auth (e2e)', () => {
         .send(loginData)
         .expect(200);
 
-      expect(response.body).toHaveProperty('accessToken');
-      expect(response.body).toHaveProperty('refreshToken');
-      expect(typeof response.body.accessToken).toBe('string');
-      expect(typeof response.body.refreshToken).toBe('string');
-      expect(response.body.accessToken.length).toBeGreaterThan(0);
-      expect(response.body.refreshToken.length).toBeGreaterThan(0);
+      const body = response.body as AuthResult;
+
+      expect(body).toHaveProperty('accessToken');
+      expect(body).toHaveProperty('refreshToken');
+      expect(typeof body.accessToken).toBe('string');
+      expect(typeof body.refreshToken).toBe('string');
+      expect(body.accessToken.length).toBeGreaterThan(0);
+      expect(body.refreshToken.length).toBeGreaterThan(0);
     });
 
     it('should return 400 Bad Request when request body is {}', async () => {
@@ -121,9 +129,11 @@ describe('Auth (e2e)', () => {
         .send({})
         .expect(400);
 
-      expect(response.body).toHaveProperty('message');
-      expect(Array.isArray(response.body.message)).toBe(true);
-      expect(response.body.message.length).toBeGreaterThan(0);
+      const body = response.body as Record<'message', string[]>;
+
+      expect(body).toHaveProperty('message');
+      expect(Array.isArray(body.message)).toBe(true);
+      expect(body.message.length).toBeGreaterThan(0);
     });
   });
 });
