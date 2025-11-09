@@ -63,6 +63,8 @@ and to support API versioning with backward compatibility
 
 - Add proper commit lint rules, fix inconsistent import base path and more test coverage
 
+- Move magic strings in thrown exceptions to constants and refactor e2e tests code for reusable code
+
 ## Tech used:
 - NestJS
 - Postgres with PostGIS extensions
