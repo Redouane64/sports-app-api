@@ -8,7 +8,7 @@ export interface AppConfig {
 
 export default registerAs<AppConfig>('app', () => {
   const config: AppConfig = {
-    nodeEnv: process.env.NODE_ENV as AppConfig['nodeEnv'],
+    nodeEnv: process.env.NODE_ENV,
     host: process.env.HOST,
     port: process.env.PORT,
   };
