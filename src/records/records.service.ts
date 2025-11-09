@@ -27,6 +27,7 @@ export class RecordService {
     let query = this.recordRepository
       .createQueryBuilder('record')
       .leftJoinAndSelect('record.author', 'author')
+      .addSelect('record.route')
       .where(`record.track_id = :trackId`, { trackId });
 
     // eslint-disable-next-line prefer-const
@@ -87,7 +88,7 @@ export class RecordService {
 
     const result = await this.list(
       trackId,
-      { ids: [entity.id] },
+      { ids: [entity.id], authorId: user.id },
       { page: 1, perPage: 1 },
       user,
     );
