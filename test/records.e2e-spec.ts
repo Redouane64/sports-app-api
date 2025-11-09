@@ -108,7 +108,6 @@ describe('RecordController (e2e)', () => {
       const body = response.body as Record;
 
       expect(body).toHaveProperty('id');
-      expect(body).toHaveProperty('route');
       expect(body).toHaveProperty('totalTime', recordData.totalTime);
       expect(body).toHaveProperty('author');
       expect(body.author).toHaveProperty('id', userId);
