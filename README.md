@@ -65,6 +65,10 @@ and to support API versioning with backward compatibility
 
 - Move magic strings in thrown exceptions to constants and refactor e2e tests code for reusable code
 
+- Currently logging setup allows tracking errors and observe SQL statement executed for database performance measurement. I think 
+this is good enough for current implementation but as complexity grows it may be better to introduce OTEL integration for more effective
+monitoring
+
 ## Tech used:
 - NestJS
 - Postgres with PostGIS extensions
