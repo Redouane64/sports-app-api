@@ -18,12 +18,12 @@
     "test:cov": "NODE_ENV=test jest --coverage",
     "test:debug": "NODE_ENV=test node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "NODE_ENV=test jest --config ./test/jest-e2e.json",
-    "typeorm:query": "typeorm-ts-node-commonjs query -d src/database/typeorm-cli-datasource.ts",
-    "typeorm:generate": "typeorm-ts-node-commonjs generate -d src/database/typeorm-cli-datasource.ts",
-    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/typeorm-cli-datasource.ts",
-    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/database/typeorm-cli-datasource.ts",
-    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/typeorm-cli-datasource.ts",
-    "migration:show": "typeorm-ts-node-commonjs migration:show -d src/database/typeorm-cli-datasource.ts"
+    "typeorm:query": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js query -d src/database/typeorm-cli-datasource.ts",
+    "typeorm:generate": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js generate -d src/database/typeorm-cli-datasource.ts",
+    "migration:run": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js migration:run -d src/database/typeorm-cli-datasource.ts",
+    "migration:generate": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js migration:generate -d src/database/typeorm-cli-datasource.ts",
+    "migration:revert": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js migration:revert -d src/database/typeorm-cli-datasource.ts",
+    "migration:show": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js migration:show -d src/database/typeorm-cli-datasource.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
