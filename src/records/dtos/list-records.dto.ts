@@ -22,6 +22,16 @@ export class ListRecordFilter {
   @ApiProperty({
     required: false,
     nullable: true,
+    type: Boolean,
+    description: 'Whether to include route data in the response',
+  })
+  @IsOptional()
+  @IsBoolean()
+  includeRoute?: boolean;
+
+  @ApiProperty({
+    required: false,
+    nullable: true,
     isArray: true,
     enum: RecordStatus,
   })
