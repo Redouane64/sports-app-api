@@ -20,7 +20,7 @@ services:
             # - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
             # enable this line if you want to save database data in case of 
             # database container is dropped
-            - ./postgresql/data:/var/lib/postgresql/data
+            - ./docker/postgresql/data:/var/lib/postgresql/data
         ports:
             - 14321:5432
         networks:
