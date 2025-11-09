@@ -140,13 +140,17 @@ export class TrackService {
     data: UpdateTrackParams,
     user: AuthenticatedUser,
   ) {
-    await this.trackRepository.update(
+    const result = await this.trackRepository.update(
       {
         id: trackId,
         authorId: user.id,
       },
       data,
     );
+
+    if (result.affected === 0) {
+      throw new NotFoundException('track_not_found');
+    }
 
     return await this.trackRepository
       .createQueryBuilder('track')
