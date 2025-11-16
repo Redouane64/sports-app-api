@@ -1,40 +1,40 @@
 version: '3'
 
 networks:
-    Api.Network:
-        name: Api.Network
-        driver: bridge
+  Api.Network:
+    name: Api.Network
+    driver: bridge
 
 services:
-    postgres:
-        container_name: Api.Database
-        image: postgis/postgis:16-3.5-alpine
-        # extra_hosts: [ 'host.docker.internal:host-gateway' ]
-        restart: unless-stopped
-        environment:
-            POSTGRES_DB: sports-app-db
-            POSTGRES_USER: admin
-            POSTGRES_PASSWORD: admin
-        volumes:
-            # any intial sql to run can be added into ./config/init.sql
-            # - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-            # enable this line if you want to save database data in case of 
-            # database container is dropped
-            - ./docker/postgresql/data:/var/lib/postgresql/data
-        ports:
-            - 14321:5432
-        networks:
-            - Api.Network
-    postgres-test:
-        container_name: Api.Test.Database
-        image: postgis/postgis:16-3.5-alpine
-        # extra_hosts: [ 'host.docker.internal:host-gateway' ]
-        restart: unless-stopped
-        environment:
-            POSTGRES_DB: sports-app-db-test
-            POSTGRES_USER: admin
-            POSTGRES_PASSWORD: admin
-        ports:
-            - 14322:5432
-        networks:
-            - Api.Network
+  postgres:
+    container_name: Api.Database
+    image: postgis/postgis:16-3.5-alpine
+    # extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sports-app-db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      # any intial sql to run can be added into ./config/init.sql
+      # - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # enable this line if you want to save database data in case of
+      # database container is dropped
+      - ./docker/postgresql/data:/var/lib/postgresql/data
+    ports:
+      - 14321:5432
+    networks:
+      - Api.Network
+  postgres-test:
+    container_name: Api.Test.Database
+    image: postgis/postgis:16-3.5-alpine
+    # extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sports-app-db-test
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - 14322:5432
+    networks:
+      - Api.Network
