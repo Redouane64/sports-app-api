@@ -109,6 +109,11 @@ DATABASE_URL=postgresql://admin:admin@localhost:14321/sports-app-db
 
 1. Make sure test database container is running: `docker compose up -d postgres-test`
 
+2. Apply database migrations to test database:
+```console
+DATABASE_URL=postgresql://admin:admin@localhost:14322/sports-app-db-test npm run migration:run
+```
+
 2. Run tests: `npm run test:e2e`
 
 ## Project structure
@@ -126,4 +131,3 @@ are used to set up infrastructure-related services.
 - **Database:** contains TypeORM configuration factories
 - **Logging:** contains logging configuration factory
 - **Config:** Configuration setup for reading from environment variables and `.env` files
-
